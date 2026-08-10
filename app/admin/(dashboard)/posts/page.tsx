@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getPosts } from "@/lib/posts";
+import { getSession } from "@/lib/session";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminPostsPage() {
+export default async function AdminPostsPage() {
   const posts = getPosts();
+  const session = await getSession();
+  const isAdmin = session?.role === "admin";
 
   return (
     <div>
@@ -51,10 +54,12 @@ export default function AdminPostsPage() {
             >
               Edit
             </Link>
-            <DeleteButton
-              url={`/api/admin/posts/${post.slug}`}
-              confirmMessage={`Delete "${post.title}"? This can't be undone.`}
-            />
+            {isAdmin && (
+              <DeleteButton
+                url={`/api/admin/posts/${post.slug}`}
+                confirmMessage={`Delete "${post.title}"? This can't be undone.`}
+              />
+            )}
           </div>
         ))}
         {posts.length === 0 && (

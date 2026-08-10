@@ -71,6 +71,17 @@ export function ExternalLinkIcon({ className = "h-4 w-4" }: IconProps) {
   );
 }
 
+export function UsersIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.7}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 19c0-3 2.5-5.2 5.5-5.2s5.5 2.2 5.5 5.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15.5 5.3a3 3 0 0 1 0 5.9" strokeLinecap="round" />
+      <path d="M17 13.9c2.3.6 3.9 2.6 3.9 5.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function LogoutIcon({ className = "h-4 w-4" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.8}>

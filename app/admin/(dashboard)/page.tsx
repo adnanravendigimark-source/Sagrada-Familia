@@ -2,23 +2,30 @@ import Link from "next/link";
 import { getToursRaw } from "@/lib/data";
 import { getPosts } from "@/lib/posts";
 import { getHomepageContent } from "@/lib/homepage";
+import { getSession } from "@/lib/session";
+import type { PageKey } from "@/lib/pageAccess";
 import { HomeIcon, StarBadgeIcon, TicketStackIcon, DocumentIcon, QuestionIcon } from "@/components/admin/icons";
 
 export const dynamic = "force-dynamic";
 
-const cards = [
-  { href: "/admin/homepage", label: "Homepage Content", desc: "Hero headline, subheading, and photo.", icon: HomeIcon },
-  { href: "/admin/recommended", label: "Recommended Tour", desc: "Which tour gets the gold spotlight + sticky mobile bar.", icon: StarBadgeIcon },
-  { href: "/admin/tours", label: "Tours & Tickets", desc: "The bookable products shown on the homepage.", icon: TicketStackIcon },
-  { href: "/admin/posts", label: "Blog Posts", desc: "Articles shown on /blog.", icon: DocumentIcon },
-  { href: "/admin/faqs", label: "FAQs", desc: "Homepage FAQ accordion.", icon: QuestionIcon },
+const cards: { href: string; label: string; desc: string; icon: typeof HomeIcon; pageKey: PageKey }[] = [
+  { href: "/admin/homepage", label: "Homepage Content", desc: "Hero headline, subheading, and photo.", icon: HomeIcon, pageKey: "homepage" },
+  { href: "/admin/recommended", label: "Recommended Tour", desc: "Which tour gets the gold spotlight + sticky mobile bar.", icon: StarBadgeIcon, pageKey: "homepage" },
+  { href: "/admin/tours", label: "Tours & Tickets", desc: "The bookable products shown on the homepage.", icon: TicketStackIcon, pageKey: "tours" },
+  { href: "/admin/posts", label: "Blog Posts", desc: "Articles shown on /blog.", icon: DocumentIcon, pageKey: "posts" },
+  { href: "/admin/faqs", label: "FAQs", desc: "Homepage FAQ accordion.", icon: QuestionIcon, pageKey: "faqs" },
 ];
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
   const tours = getToursRaw();
   const posts = getPosts();
   const content = getHomepageContent();
   const featuredTour = tours.find((t) => t.id === content.featuredTourId);
+
+  const session = await getSession();
+  const isAdmin = session?.role === "admin";
+  const pages = session?.pages || [];
+  const visibleCards = cards.filter((c) => isAdmin || pages.includes(c.pageKey));
 
   return (
     <div>
@@ -48,7 +55,7 @@ export default function AdminDashboardPage() {
 
       <p className="mt-10 text-xs font-semibold uppercase tracking-widest text-stone-400">Manage content</p>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
-        {cards.map((card) => {
+        {visibleCards.map((card) => {
           const Icon = card.icon;
           return (
             <Link
@@ -66,6 +73,12 @@ export default function AdminDashboardPage() {
             </Link>
           );
         })}
+        {visibleCards.length === 0 && (
+          <p className="rounded-2xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500 sm:col-span-2">
+            You don't have access to any sections yet — ask an admin to grant you page access from
+            Users.
+          </p>
+        )}
       </div>
     </div>
   );

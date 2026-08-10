@@ -2,8 +2,20 @@
 // (globalThis.crypto.subtle) rather than Node's `crypto` module so the exact
 // same code runs correctly in both the Edge middleware and Node API routes
 // without any extra dependency.
+import type { PageKey } from "./pageAccess";
+
 const SECRET = process.env.ADMIN_SESSION_SECRET || "sagrada-admin-dev-secret-change-me";
 export const ADMIN_COOKIE_NAME = "sf_admin_session";
+
+export type SessionRole = "admin" | "editor";
+
+export interface Session {
+  email: string;
+  role: SessionRole;
+  // Which admin sections this session can see/edit. Only meaningful for
+  // role "editor" — admins always have full access regardless of this list.
+  pages: PageKey[];
+}
 
 async function getKey() {
   const enc = new TextEncoder();
@@ -34,20 +46,25 @@ async function sign(payload: string) {
   return toBase64Url(sigBuf);
 }
 
-export async function createSessionToken(email: string): Promise<string> {
-  const payload = toBase64Url(email);
+export async function createSessionToken(session: Session): Promise<string> {
+  const payload = toBase64Url(JSON.stringify(session));
   const sig = await sign(payload);
   return `${payload}.${sig}`;
 }
 
-export async function verifySessionToken(token: string | undefined | null): Promise<string | null> {
+export async function verifySessionToken(token: string | undefined | null): Promise<Session | null> {
   if (!token) return null;
   const [payload, sig] = token.split(".");
   if (!payload || !sig) return null;
   const expected = await sign(payload);
   if (expected !== sig) return null;
   try {
-    return fromBase64Url(payload);
+    const parsed = JSON.parse(fromBase64Url(payload));
+    if (!parsed?.email || (parsed.role !== "admin" && parsed.role !== "editor")) return null;
+    // Sessions signed before per-page access existed won't have `pages` —
+    // default to an empty list (no access) rather than rejecting the token.
+    const pages = Array.isArray(parsed.pages) ? (parsed.pages as PageKey[]) : [];
+    return { email: parsed.email, role: parsed.role, pages };
   } catch {
     return null;
   }

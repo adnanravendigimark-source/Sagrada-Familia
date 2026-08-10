@@ -2,24 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GridIcon, HomeIcon, StarBadgeIcon, TicketStackIcon, DocumentIcon, QuestionIcon } from "./icons";
+import type { PageKey } from "@/lib/pageAccess";
+import {
+  GridIcon,
+  HomeIcon,
+  StarBadgeIcon,
+  TicketStackIcon,
+  DocumentIcon,
+  QuestionIcon,
+  UsersIcon,
+} from "./icons";
 
-const navItems = [
+const baseNavItems: { href: string; label: string; icon: typeof GridIcon; pageKey?: PageKey }[] = [
   { href: "/admin", label: "Dashboard", icon: GridIcon },
-  { href: "/admin/homepage", label: "Homepage", icon: HomeIcon },
-  { href: "/admin/recommended", label: "Recommended Tour", icon: StarBadgeIcon },
-  { href: "/admin/tours", label: "Tours & Tickets", icon: TicketStackIcon },
-  { href: "/admin/posts", label: "Blog Posts", icon: DocumentIcon },
-  { href: "/admin/faqs", label: "FAQs", icon: QuestionIcon },
+  { href: "/admin/homepage", label: "Homepage", icon: HomeIcon, pageKey: "homepage" },
+  { href: "/admin/recommended", label: "Recommended Tour", icon: StarBadgeIcon, pageKey: "homepage" },
+  { href: "/admin/tours", label: "Tours & Tickets", icon: TicketStackIcon, pageKey: "tours" },
+  { href: "/admin/posts", label: "Blog Posts", icon: DocumentIcon, pageKey: "posts" },
+  { href: "/admin/faqs", label: "FAQs", icon: QuestionIcon, pageKey: "faqs" },
 ];
+
+const usersNavItem = { href: "/admin/users", label: "Users", icon: UsersIcon };
+
+function visibleNavItems(isAdmin: boolean, pages: PageKey[]) {
+  const items = baseNavItems.filter((item) => !item.pageKey || isAdmin || pages.includes(item.pageKey));
+  return isAdmin ? [...items, usersNavItem] : items;
+}
 
 function isActive(pathname: string, href: string) {
   if (href === "/admin") return pathname === "/admin";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AdminSidebarNav() {
+export function AdminSidebarNav({ isAdmin, pages }: { isAdmin: boolean; pages: PageKey[] }) {
   const pathname = usePathname();
+  const navItems = visibleNavItems(isAdmin, pages);
   return (
     <nav className="flex-1 space-y-0.5 px-3 py-6">
       {navItems.map((item) => {
@@ -44,8 +61,9 @@ export function AdminSidebarNav() {
   );
 }
 
-export function AdminMobileNav() {
+export function AdminMobileNav({ isAdmin, pages }: { isAdmin: boolean; pages: PageKey[] }) {
   const pathname = usePathname();
+  const navItems = visibleNavItems(isAdmin, pages);
   return (
     <nav className="flex gap-1.5 overflow-x-auto border-b border-stone-900/10 bg-white px-4 py-2 sm:hidden">
       {navItems.map((item) => {

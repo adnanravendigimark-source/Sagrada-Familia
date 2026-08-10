@@ -1,11 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/Logo.png";
+import { getSession } from "@/lib/session";
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { AdminSidebarNav, AdminMobileNav } from "@/components/admin/AdminNav";
 import { ExternalLinkIcon } from "@/components/admin/icons";
 
-export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  const isAdmin = session?.role === "admin";
+  const pages = session?.pages || [];
+
   return (
     <div className="flex min-h-screen bg-stone-100 font-body text-stone-900">
       <aside className="hidden w-64 shrink-0 flex-col bg-stone-900 text-white sm:flex">
@@ -26,7 +31,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             </p>
           </div>
         </div>
-        <AdminSidebarNav />
+        <AdminSidebarNav isAdmin={isAdmin} pages={pages} />
         <div className="border-t border-white/10 p-4">
           <Link
             href="/"
@@ -50,7 +55,18 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
           </div>
           <div className="hidden items-center gap-2 text-sm text-stone-500 sm:flex">
             <span className="h-2 w-2 rounded-full bg-green-500" />
-            Site is live
+            {session && (
+              <>
+                {session.email}
+                <span
+                  className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                    isAdmin ? "bg-gold-500/15 text-gold-600" : "bg-stone-200 text-stone-600"
+                  }`}
+                >
+                  {session.role}
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -64,12 +80,12 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               <AdminLogoutButton compact />
             </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-basilica-plum text-xs font-bold text-white sm:hidden">
-              A
+              {session?.email.slice(0, 1).toUpperCase() || "A"}
             </span>
           </div>
         </header>
 
-        <AdminMobileNav />
+        <AdminMobileNav isAdmin={isAdmin} pages={pages} />
         <main className="mx-auto max-w-5xl px-4 py-8 sm:px-8 sm:py-10">{children}</main>
       </div>
     </div>

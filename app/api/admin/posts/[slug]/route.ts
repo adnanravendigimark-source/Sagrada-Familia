@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPosts, savePosts, type Post } from "@/lib/posts";
+import { getSession } from "@/lib/session";
 
 export async function GET(_req: Request, { params }: { params: { slug: string } }) {
   const post = getPosts().find((p) => p.slug === params.slug);
@@ -18,6 +19,11 @@ export async function PUT(req: Request, { params }: { params: { slug: string } }
 }
 
 export async function DELETE(_req: Request, { params }: { params: { slug: string } }) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "Only admins can delete." }, { status: 403 });
+  }
+
   const posts = getPosts();
   const next = posts.filter((p) => p.slug !== params.slug);
   if (next.length === posts.length) {

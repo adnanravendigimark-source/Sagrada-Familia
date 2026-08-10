@@ -23,7 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndexPage() {
-  const [featured, ...rest] = getPosts();
+  const posts = getPosts();
+  const [featured, ...rest] = posts;
 
   return (
     <>
@@ -41,33 +42,41 @@ export default function BlogIndexPage() {
           </p>
         </div>
 
+        {!featured && (
+          <p className="mt-14 rounded-3xl border border-dashed border-stone-300 p-10 text-center text-sm text-stone-500">
+            No articles published yet — check back soon.
+          </p>
+        )}
+
         {/* Featured post */}
-        <Link
-          href={`/blog/${featured.slug}`}
-          className="group mt-14 grid gap-0 overflow-hidden rounded-3xl border border-stone-900/10 bg-white shadow-sm transition hover:shadow-xl md:grid-cols-2"
-        >
-          <div className="relative aspect-[16/10] overflow-hidden md:aspect-auto">
-            <Image
-              src={featured.image}
-              alt={featured.imageAlt}
-              fill
-              sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover transition duration-500 group-hover:scale-105"
-            />
-          </div>
-          <div className="flex flex-col justify-center p-8 sm:p-10">
-            <span className="inline-flex w-fit rounded-full bg-basilica-teal/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-basilica-teal">
-              {featured.category}
-            </span>
-            <h2 className="mt-4 font-display text-2xl font-bold text-stone-900 group-hover:text-basilica-terracotta">
-              {featured.title}
-            </h2>
-            <p className="mt-3 text-stone-900/70">{featured.excerpt}</p>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-basilica-terracotta">
-              Read the guide <span className="transition group-hover:translate-x-0.5">→</span>
-            </span>
-          </div>
-        </Link>
+        {featured && (
+          <Link
+            href={`/blog/${featured.slug}`}
+            className="group mt-14 grid gap-0 overflow-hidden rounded-3xl border border-stone-900/10 bg-white shadow-sm transition hover:shadow-xl md:grid-cols-2"
+          >
+            <div className="relative aspect-[16/10] overflow-hidden md:aspect-auto">
+              <Image
+                src={featured.image}
+                alt={featured.imageAlt}
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover transition duration-500 group-hover:scale-105"
+              />
+            </div>
+            <div className="flex flex-col justify-center p-8 sm:p-10">
+              <span className="inline-flex w-fit rounded-full bg-basilica-teal/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-basilica-teal">
+                {featured.category}
+              </span>
+              <h2 className="mt-4 font-display text-2xl font-bold text-stone-900 group-hover:text-basilica-terracotta">
+                {featured.title}
+              </h2>
+              <p className="mt-3 text-stone-900/70">{featured.excerpt}</p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-basilica-terracotta">
+                Read the guide <span className="transition group-hover:translate-x-0.5">→</span>
+              </span>
+            </div>
+          </Link>
+        )}
 
         {/* Remaining posts */}
         <div className="mt-8 grid gap-8 sm:grid-cols-2">

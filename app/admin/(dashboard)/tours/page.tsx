@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getToursRaw } from "@/lib/data";
+import { getSession } from "@/lib/session";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminToursPage() {
+export default async function AdminToursPage() {
   const tours = getToursRaw();
+  const session = await getSession();
+  const isAdmin = session?.role === "admin";
 
   return (
     <div>
@@ -44,10 +47,12 @@ export default function AdminToursPage() {
             >
               Edit
             </Link>
-            <DeleteButton
-              url={`/api/admin/tours/${tour.id}`}
-              confirmMessage={`Delete "${tour.title}"? This can't be undone.`}
-            />
+            {isAdmin && (
+              <DeleteButton
+                url={`/api/admin/tours/${tour.id}`}
+                confirmMessage={`Delete "${tour.title}"? This can't be undone.`}
+              />
+            )}
           </div>
         ))}
         {tours.length === 0 && (
