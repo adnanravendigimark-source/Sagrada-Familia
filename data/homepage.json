@@ -1,0 +1,18 @@
+{
+  "heroBadge": "⚡ Certified guides · Skip the line",
+  "heroHeading": "Sagrada Familia Guided Tours — See What a Guide Sees",
+  "heroSubheading": "Skip the line, hear Gaudí's design explained by a certified local guide, and add tower access for the view over Barcelona. Book your Sagrada Familia guided tour online — instant confirmation, free cancellation.",
+  "heroImage": "https://images.unsplash.com/photo-1735424325493-7dec695219c4?q=80&w=2400&auto=format&fit=crop",
+  "heroImageAlt": "Sunlight pouring through stained glass and tree-like columns inside the Sagrada Familia basilica",
+  "ratingValue": "4.8 / 5",
+  "ratingCount": "1,200+ reviews",
+  "showFeaturedTour": true,
+  "featuredTourId": "skip-the-line-ticket",
+  "featuredBadgeLabel": "Recommended",
+  "featuredUrgencyText": "Best Price · Limited Availability",
+  "featuredReasons": [
+    "Skip the guesswork — our top-booked option",
+    "Certified guide, not just fast-track entry",
+    "Free cancellation up to 24 hours before"
+  ]
+}

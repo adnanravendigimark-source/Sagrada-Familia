@@ -1,0 +1,85 @@
+import Link from "next/link";
+import Image from "next/image";
+import logo from "@/assets/Logo.png";
+
+// Logo.png is a tall lockup: icon + halo arc on top (~0–60% of the canvas
+// height), a clear blank gap, then the "LA SAGRADA FAMILIA / GUIDED TOURS"
+// text underneath. A header row is short and wide, so showing the whole
+// tall lockup forces the text down to an illegible size — that's the "looks
+// small" problem. Fix: for the compact (header/footer) use, crop to just
+// the icon region with a wide frame (object-cover + object-top so the crop
+// always starts at the very top of the image and only ever removes canvas
+// from the bottom — it can never cut into the icon itself), sized to fill
+// the row. For the stacked use (plenty of vertical room), show the full,
+// uncropped artwork at its true aspect ratio.
+export default function Logo({
+  className = "",
+  variant = "compact",
+  theme = "light",
+}: {
+  className?: string;
+  variant?: "compact" | "stacked";
+  theme?: "light" | "dark";
+}) {
+  const isDark = theme === "dark";
+
+  if (variant === "stacked") {
+    return (
+      <Link href="/" className={`inline-flex items-center ${className}`}>
+        <Image
+          src={logo}
+          alt="La Sagrada Familia Guided Tours"
+          priority
+          className="h-32 w-auto sm:h-40"
+        />
+      </Link>
+    );
+  }
+
+  const image = (
+    <span className="relative block h-11 w-[5.75rem] overflow-hidden sm:h-12 sm:w-[6.25rem]">
+      <Image
+        src={logo}
+        alt="La Sagrada Familia Guided Tours"
+        fill
+        priority
+        sizes="150px"
+        // className="object-cover object-top"
+      />
+    </span>
+  );
+
+  const wordmark = (
+    <span className="hidden items-center gap-3 sm:flex">
+      <span
+        className={`h-8 w-px shrink-0 ${isDark ? "bg-gold-400/40" : "bg-gold-500/40"}`}
+        aria-hidden="true"
+      />
+      <span className="leading-tight">
+        <span
+          className={`block whitespace-nowrap font-display text-lg font-semibold italic tracking-tight ${
+            isDark ? "text-white" : "text-stone-900"
+          }`}
+        >
+          La Sagrada Familia
+        </span>
+        <span
+          className={`block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.24em] ${
+            isDark ? "text-gold-400" : "text-basilica-terracotta"
+          }`}
+        >
+          Guided Tours
+        </span>
+      </span>
+    </span>
+  );
+
+  // Logo.png itself has no background baked in, so both themes render it
+  // the same way — no extra white card behind it.
+  return (
+    <Link href="/" className={`inline-flex items-center gap-3 ${className}`}>
+      {image}
+      {wordmark}
+    </Link>
+  );
+}
