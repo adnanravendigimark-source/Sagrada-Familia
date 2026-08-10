@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { getTours } from "@/lib/data";
 import { getHomepageContent } from "@/lib/homepage";
 
@@ -7,18 +7,19 @@ import { getHomepageContent } from "@/lib/homepage";
 // there's room to browse the full grid, so the same tour is instead
 // highlighted in place inside TourGrid/TourCard (gold "Recommended"
 // treatment) rather than floating as a separate section — see TourGrid.tsx.
-export default function FeaturedTour() {
-  const content = getHomepageContent();
+export default async function FeaturedTour() {
+  const content = await getHomepageContent();
   if (!content.showFeaturedTour) return null;
 
-  const tour = getTours().find((t) => t.id === content.featuredTourId);
+  const tours = await getTours();
+  const tour = tours.find((t) => t.id === content.featuredTourId);
   if (!tour) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-900/10 bg-white/95 px-3 py-2.5 shadow-[0_-6px_20px_rgba(0,0,0,0.12)] backdrop-blur sm:hidden">
       <div className="flex items-center gap-3">
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
-          <Image src={tour.image} alt={tour.imageAlt} fill sizes="48px" className="object-cover" />
+          <SafeImage src={tour.image} alt={tour.imageAlt} fill sizes="48px" className="object-cover" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-semibold leading-tight text-stone-900">{tour.title}</p>

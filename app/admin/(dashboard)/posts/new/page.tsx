@@ -4,8 +4,8 @@ import type { Post } from "@/lib/posts";
 
 export const dynamic = "force-dynamic";
 
-export default function NewPostPage() {
-  const tours = getTours();
+export default async function NewPostPage() {
+  const tours = await getTours();
 
   const blank: Post = {
     slug: "",

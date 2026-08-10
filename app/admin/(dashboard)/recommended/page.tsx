@@ -4,9 +4,9 @@ import RecommendedTourForm from "@/components/admin/RecommendedTourForm";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminRecommendedTourPage() {
-  const content = getHomepageContent();
-  const tours = getTours();
+export default async function AdminRecommendedTourPage() {
+  const content = await getHomepageContent();
+  const tours = await getTours();
 
   return (
     <div>

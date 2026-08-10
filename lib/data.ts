@@ -1,4 +1,4 @@
-import { readJson, writeJson } from "./cms";
+import { sql } from "./db";
 
 // ---------------------------------------------------------------------------
 // AFFILIATE / PARTNER IDS
@@ -15,9 +15,9 @@ function gygLink(path: string, extra = "") {
 
 export type TourType = "guided" | "self-guided" | "combo";
 
-// The record shape stored in data/tours.json (and edited via /admin) — the
-// affiliate link is stored as two plain parts (hrefPath/hrefExtra) so the
-// CMS never has to touch the partner-ID query string directly.
+// The record shape stored in the `tours` table (and edited via /admin) —
+// the affiliate link is stored as two plain parts (hrefPath/hrefExtra) so
+// the CMS never has to touch the partner-ID query string directly.
 export interface TourRecord {
   id: string;
   badge: TourType;
@@ -44,23 +44,110 @@ export interface Tour extends Omit<TourRecord, "hrefPath" | "hrefExtra"> {
   href: string;
 }
 
-export function getToursRaw(): TourRecord[] {
-  return readJson<TourRecord[]>("tours.json");
+function parseJsonArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
-export function saveTours(records: TourRecord[]): void {
-  writeJson("tours.json", records);
+function rowToTour(row: any): TourRecord {
+  return {
+    id: row.id,
+    badge: row.badge,
+    ribbon: row.ribbon || undefined,
+    title: row.title,
+    description: row.description,
+    includes: parseJsonArray(row.includes),
+    duration: row.duration || undefined,
+    rating: Number(row.rating),
+    reviews: Number(row.reviews),
+    price: Number(row.price),
+    originalPrice: row.original_price === null ? undefined : Number(row.original_price),
+    image: row.image,
+    imageAlt: row.image_alt,
+    hrefPath: row.href_path,
+    hrefExtra: row.href_extra || undefined,
+    featured: !!row.featured,
+    bestFor: row.best_for,
+  };
 }
 
-export function getTours(): Tour[] {
-  return getToursRaw().map(({ hrefPath, hrefExtra, ...rest }) => ({
+export async function getToursRaw(): Promise<TourRecord[]> {
+  try {
+    const rows = await sql`SELECT * FROM tours ORDER BY sort_order ASC, id ASC`;
+    return rows.map(rowToTour);
+  } catch {
+    // DATABASE_URL not set yet, or `node scripts/setup-db.mjs` hasn't been
+    // run — fail soft with an empty list instead of crashing the page.
+    return [];
+  }
+}
+
+// Replaces the full tour list with exactly the given records — upserts
+// everything passed in, then removes any row not present in `records`.
+// This matches how the admin API routes already call it (read the full
+// list, apply one change, pass the whole thing back).
+export async function saveTours(records: TourRecord[]): Promise<void> {
+  for (let i = 0; i < records.length; i++) {
+    const t = records[i];
+    await sql`
+      INSERT INTO tours (
+        id, badge, ribbon, title, description, includes, duration, rating,
+        reviews, price, original_price, image, image_alt, href_path,
+        href_extra, featured, best_for, sort_order
+      ) VALUES (
+        ${t.id}, ${t.badge}, ${t.ribbon || null}, ${t.title}, ${t.description},
+        ${JSON.stringify(t.includes || [])}::jsonb, ${t.duration || null}, ${t.rating},
+        ${t.reviews}, ${t.price}, ${t.originalPrice ?? null}, ${t.image}, ${t.imageAlt},
+        ${t.hrefPath}, ${t.hrefExtra || null}, ${!!t.featured}, ${t.bestFor}, ${i}
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        badge = EXCLUDED.badge,
+        ribbon = EXCLUDED.ribbon,
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        includes = EXCLUDED.includes,
+        duration = EXCLUDED.duration,
+        rating = EXCLUDED.rating,
+        reviews = EXCLUDED.reviews,
+        price = EXCLUDED.price,
+        original_price = EXCLUDED.original_price,
+        image = EXCLUDED.image,
+        image_alt = EXCLUDED.image_alt,
+        href_path = EXCLUDED.href_path,
+        href_extra = EXCLUDED.href_extra,
+        featured = EXCLUDED.featured,
+        best_for = EXCLUDED.best_for,
+        sort_order = EXCLUDED.sort_order
+    `;
+  }
+
+  const existing = await sql`SELECT id FROM tours`;
+  const keepIds = records.map((t) => t.id);
+  const toDelete = existing.map((r) => r.id as string).filter((id) => !keepIds.includes(id));
+  for (const id of toDelete) {
+    await sql`DELETE FROM tours WHERE id = ${id}`;
+  }
+}
+
+export async function getTours(): Promise<Tour[]> {
+  const records = await getToursRaw();
+  return records.map(({ hrefPath, hrefExtra, ...rest }) => ({
     ...rest,
     href: gygLink(hrefPath, hrefExtra || ""),
   }));
 }
 
-export function getTour(id: string): Tour | undefined {
-  return getTours().find((t) => t.id === id);
+export async function getTour(id: string): Promise<Tour | undefined> {
+  const tours = await getTours();
+  return tours.find((t) => t.id === id);
 }
 
 export interface ComboOfferRecord {
@@ -78,16 +165,50 @@ export interface ComboOffer {
   href: string;
 }
 
-export function getComboOffersRaw(): ComboOfferRecord[] {
-  return readJson<ComboOfferRecord[]>("combo-offers.json");
+function rowToComboOffer(row: any): ComboOfferRecord {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    hrefPath: row.href_path,
+    hrefExtra: row.href_extra || undefined,
+  };
 }
 
-export function saveComboOffers(records: ComboOfferRecord[]): void {
-  writeJson("combo-offers.json", records);
+export async function getComboOffersRaw(): Promise<ComboOfferRecord[]> {
+  try {
+    const rows = await sql`SELECT * FROM combo_offers ORDER BY sort_order ASC, id ASC`;
+    return rows.map(rowToComboOffer);
+  } catch {
+    return [];
+  }
 }
 
-export function getComboOffers(): ComboOffer[] {
-  return getComboOffersRaw().map(({ hrefPath, hrefExtra, ...rest }) => ({
+export async function saveComboOffers(records: ComboOfferRecord[]): Promise<void> {
+  for (let i = 0; i < records.length; i++) {
+    const o = records[i];
+    await sql`
+      INSERT INTO combo_offers (id, title, description, href_path, href_extra, sort_order)
+      VALUES (${o.id}, ${o.title}, ${o.description}, ${o.hrefPath}, ${o.hrefExtra || null}, ${i})
+      ON CONFLICT (id) DO UPDATE SET
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        href_path = EXCLUDED.href_path,
+        href_extra = EXCLUDED.href_extra,
+        sort_order = EXCLUDED.sort_order
+    `;
+  }
+  const existing = await sql`SELECT id FROM combo_offers`;
+  const keepIds = records.map((o) => o.id);
+  const toDelete = existing.map((r) => r.id as string).filter((id) => !keepIds.includes(id));
+  for (const id of toDelete) {
+    await sql`DELETE FROM combo_offers WHERE id = ${id}`;
+  }
+}
+
+export async function getComboOffers(): Promise<ComboOffer[]> {
+  const records = await getComboOffersRaw();
+  return records.map(({ hrefPath, hrefExtra, ...rest }) => ({
     ...rest,
     href: gygLink(hrefPath, hrefExtra || ""),
   }));
@@ -98,10 +219,21 @@ export interface FAQ {
   answer: string;
 }
 
-export function getFaqs(): FAQ[] {
-  return readJson<FAQ[]>("faqs.json");
+export async function getFaqs(): Promise<FAQ[]> {
+  try {
+    const rows = await sql`SELECT question, answer FROM faqs ORDER BY sort_order ASC, id ASC`;
+    return rows.map((r: any) => ({ question: r.question, answer: r.answer }));
+  } catch {
+    return [];
+  }
 }
 
-export function saveFaqs(faqs: FAQ[]): void {
-  writeJson("faqs.json", faqs);
+// FAQs have no stable id from the admin form (it just posts the full
+// list), so a save is a clean replace: wipe the table, reinsert in order.
+export async function saveFaqs(faqs: FAQ[]): Promise<void> {
+  await sql`DELETE FROM faqs`;
+  for (let i = 0; i < faqs.length; i++) {
+    const f = faqs[i];
+    await sql`INSERT INTO faqs (question, answer, sort_order) VALUES (${f.question}, ${f.answer}, ${i})`;
+  }
 }

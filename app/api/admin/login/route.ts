@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createSessionToken, ADMIN_COOKIE_NAME, type Session } from "@/lib/auth";
 import { verifyUserCredentials } from "@/lib/users";
 import { PAGE_KEYS } from "@/lib/pageAccess";
+import { DB_ERROR_MESSAGE } from "@/lib/db";
 
 export async function POST(req: Request) {
   let email = "";
@@ -25,14 +26,19 @@ export async function POST(req: Request) {
   }
 
   // The .env credentials are the always-valid "owner" account (role: admin)
-  // — it can't be deleted and works even if users.json is empty. Everyone
-  // else is a user created from /admin/users.
+  // — it can't be deleted and works even if the users table is empty or
+  // unreachable. Everyone else is a user created from /admin/users.
   let session: Session | null = null;
 
   if (email === rootEmail && password === rootPassword) {
     session = { email, role: "admin", pages: [...PAGE_KEYS] };
   } else {
-    const user = verifyUserCredentials(email, password);
+    let user;
+    try {
+      user = await verifyUserCredentials(email, password);
+    } catch {
+      return NextResponse.json({ error: DB_ERROR_MESSAGE }, { status: 500 });
+    }
     if (user) session = { email: user.email, role: user.role, pages: user.pages };
   }
 

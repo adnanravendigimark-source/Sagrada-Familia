@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "./SafeImage";
 import type { Tour } from "@/lib/data";
 import { LockIcon } from "./icons";
 
@@ -23,7 +23,7 @@ export default function TourCard({
     >
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
-        <Image
+        <SafeImage
           src={tour.image}
           alt={tour.imageAlt}
           fill

@@ -5,10 +5,10 @@ import PostForm from "@/components/admin/PostForm";
 
 export const dynamic = "force-dynamic";
 
-export default function EditPostPage({ params }: { params: { slug: string } }) {
-  const post = getPost(params.slug);
+export default async function EditPostPage({ params }: { params: { slug: string } }) {
+  const post = await getPost(params.slug);
   if (!post) notFound();
-  const tours = getTours();
+  const tours = await getTours();
 
   return (
     <div>

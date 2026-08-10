@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getPosts, savePosts, type Post } from "@/lib/posts";
+import { DB_ERROR_MESSAGE } from "@/lib/db";
 
 export async function GET() {
-  return NextResponse.json(getPosts());
+  return NextResponse.json(await getPosts());
 }
 
 export async function POST(req: Request) {
@@ -19,12 +20,16 @@ export async function POST(req: Request) {
     );
   }
 
-  const posts = getPosts();
+  const posts = await getPosts();
   if (posts.some((p) => p.slug === body.slug)) {
     return NextResponse.json({ error: "A post with this slug already exists." }, { status: 400 });
   }
 
   posts.push({ ...body, content: body.content || [] });
-  savePosts(posts);
+  try {
+    await savePosts(posts);
+  } catch {
+    return NextResponse.json({ error: DB_ERROR_MESSAGE }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

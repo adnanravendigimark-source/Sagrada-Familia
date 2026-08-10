@@ -3,8 +3,8 @@ import FaqsForm from "@/components/admin/FaqsForm";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminFaqsPage() {
-  const faqs = getFaqs();
+export default async function AdminFaqsPage() {
+  const faqs = await getFaqs();
 
   return (
     <div>

@@ -3,8 +3,8 @@ import { getTours } from "@/lib/data";
 // Built directly from the tours sold above — every row is a real,
 // bookable product with its own "Book" link, so this table works as a
 // second conversion surface rather than just reference info.
-export default function PriceComparison() {
-  const tours = getTours();
+export default async function PriceComparison() {
+  const tours = await getTours();
   return (
     <section id="prices" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <h2 className="font-display text-3xl font-bold text-stone-900">Compare & Choose Your Tours & Ticket</h2>

@@ -4,8 +4,12 @@ import UserEditForm from "@/components/admin/UserEditForm";
 
 export const dynamic = "force-dynamic";
 
-export default function EditUserPage({ params }: { params: { id: string } }) {
-  const user = getSafeUsers().find((u) => u.id === params.id);
+// Not linked to from anywhere anymore — editing now happens in an in-page
+// modal from /admin/users (see components/admin/UsersList.tsx). Left in
+// place as a working direct-link fallback rather than removed.
+export default async function EditUserPage({ params }: { params: { id: string } }) {
+  const users = await getSafeUsers();
+  const user = users.find((u) => u.id === params.id);
   if (!user) notFound();
 
   return (

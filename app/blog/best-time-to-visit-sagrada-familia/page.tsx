@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
@@ -7,6 +6,7 @@ import Footer from "@/components/Footer";
 import QuickAnswer from "@/components/QuickAnswer";
 import BlogPostBody from "@/components/BlogPostBody";
 import BlogSidebar from "@/components/BlogSidebar";
+import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
 
 const slug = "best-time-to-visit-sagrada-familia";
@@ -16,7 +16,7 @@ const slug = "best-time-to-visit-sagrada-familia";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const post = getPost(slug);
+  const post = await getPost(slug);
   if (!post) return {};
   return {
     title: post.metaTitle,
@@ -30,8 +30,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function Post() {
-  const post = getPost(slug);
+export default async function Post() {
+  const post = await getPost(slug);
   if (!post) notFound();
 
   return (
@@ -49,7 +49,7 @@ export default function Post() {
             {post.title}
           </h1>
           <div className="relative mt-8 aspect-[21/9] w-full overflow-hidden rounded-2xl">
-            <Image
+            <SafeImage
               src={post.image}
               alt={post.imageAlt}
               fill

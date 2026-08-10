@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SafeImage from "@/components/SafeImage";
 import { getPosts } from "@/lib/posts";
 
 // Posts now live in /data/posts.json, editable from /admin/posts — render
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function BlogIndexPage() {
-  const posts = getPosts();
+export default async function BlogIndexPage() {
+  const posts = await getPosts();
   const [featured, ...rest] = posts;
 
   return (
@@ -55,7 +55,7 @@ export default function BlogIndexPage() {
             className="group mt-14 grid gap-0 overflow-hidden rounded-3xl border border-stone-900/10 bg-white shadow-sm transition hover:shadow-xl md:grid-cols-2"
           >
             <div className="relative aspect-[16/10] overflow-hidden md:aspect-auto">
-              <Image
+              <SafeImage
                 src={featured.image}
                 alt={featured.imageAlt}
                 fill
@@ -87,7 +87,7 @@ export default function BlogIndexPage() {
               className="group overflow-hidden rounded-2xl border border-stone-900/10 bg-white shadow-sm transition hover:shadow-lg"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
-                <Image
+                <SafeImage
                   src={post.image}
                   alt={post.imageAlt}
                   fill

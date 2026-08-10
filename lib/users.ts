@@ -1,5 +1,4 @@
-import crypto from "crypto";
-import { readJson, writeJson } from "./cms";
+import { sql } from "./db";
 import { hashPassword, verifyPassword } from "./passwords";
 import { PAGE_KEYS, type PageKey } from "./pageAccess";
 
@@ -36,92 +35,115 @@ function normalizePages(role: UserRole, pages: PageKey[]): PageKey[] {
   return Array.from(new Set(valid));
 }
 
-export function getUsers(): User[] {
-  // Older accounts created before per-page access existed won't have a
-  // `pages` field in the JSON file — default them to admin-equivalent
-  // full access rather than silently locking them out of everything.
-  return readJson<User[]>("users.json").map((u) => ({
-    ...u,
-    pages: Array.isArray(u.pages) ? u.pages : [...PAGE_KEYS],
-  }));
+function parsePagesColumn(value: unknown): PageKey[] {
+  if (Array.isArray(value)) return value as PageKey[];
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? (parsed as PageKey[]) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
-export function getSafeUsers(): SafeUser[] {
-  return getUsers().map(toSafe);
+function rowToUser(row: any): User {
+  // Accounts created before per-page access existed won't have a `pages`
+  // value — default admins to full access, editors to none (safest
+  // default rather than silently granting everything).
+  const pages = parsePagesColumn(row.pages);
+  return {
+    id: row.id,
+    email: row.email,
+    passwordHash: row.password_hash,
+    role: row.role,
+    pages: row.role === "admin" ? [...PAGE_KEYS] : pages,
+    createdAt:
+      row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+  };
 }
 
-export function saveUsers(users: User[]): void {
-  writeJson("users.json", users);
+export async function getUsers(): Promise<User[]> {
+  try {
+    const rows = await sql`SELECT * FROM users ORDER BY created_at ASC`;
+    return rows.map(rowToUser);
+  } catch {
+    // DATABASE_URL not set yet, or `node scripts/setup-db.mjs` hasn't been
+    // run — fail soft with an empty list instead of crashing the page. The
+    // .env owner account still works regardless (it doesn't touch this table).
+    return [];
+  }
 }
 
-export function findUserByEmail(email: string): User | undefined {
-  return getUsers().find((u) => u.email.toLowerCase() === email.toLowerCase());
+export async function getSafeUsers(): Promise<SafeUser[]> {
+  return (await getUsers()).map(toSafe);
 }
 
-export function findUserById(id: string): User | undefined {
-  return getUsers().find((u) => u.id === id);
+export async function findUserByEmail(email: string): Promise<User | undefined> {
+  const rows = await sql`SELECT * FROM users WHERE lower(email) = lower(${email}) LIMIT 1`;
+  return rows.length ? rowToUser(rows[0]) : undefined;
 }
 
-export function createUser(
+export async function findUserById(id: string): Promise<User | undefined> {
+  const rows = await sql`SELECT * FROM users WHERE id = ${id} LIMIT 1`;
+  return rows.length ? rowToUser(rows[0]) : undefined;
+}
+
+export async function createUser(
   email: string,
   password: string,
   role: UserRole,
   pages: PageKey[]
-): SafeUser {
-  const users = getUsers();
-  if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
+): Promise<SafeUser> {
+  const existing = await findUserByEmail(email);
+  if (existing) {
     throw new Error("A user with this email already exists.");
   }
-  const user: User = {
-    id: crypto.randomUUID(),
-    email,
-    passwordHash: hashPassword(password),
-    role,
-    pages: normalizePages(role, pages),
-    createdAt: new Date().toISOString(),
-  };
-  users.push(user);
-  saveUsers(users);
-  return toSafe(user);
+  const passwordHash = hashPassword(password);
+  const normalizedPages = normalizePages(role, pages);
+  const rows = await sql`
+    INSERT INTO users (email, password_hash, role, pages)
+    VALUES (${email}, ${passwordHash}, ${role}, ${JSON.stringify(normalizedPages)}::jsonb)
+    RETURNING *
+  `;
+  return toSafe(rowToUser(rows[0]));
 }
 
-export function updateUser(
+export async function updateUser(
   id: string,
   updates: { email?: string; role?: UserRole; pages?: PageKey[]; password?: string }
-): SafeUser {
-  const users = getUsers();
-  const idx = users.findIndex((u) => u.id === id);
-  if (idx === -1) throw new Error("User not found.");
+): Promise<SafeUser> {
+  const current = await findUserById(id);
+  if (!current) throw new Error("User not found.");
 
-  const current = users[idx];
   const nextEmail = (updates.email || current.email).trim();
   if (nextEmail.toLowerCase() !== current.email.toLowerCase()) {
-    if (users.some((u, i) => i !== idx && u.email.toLowerCase() === nextEmail.toLowerCase())) {
-      throw new Error("A user with this email already exists.");
-    }
+    const clash = await findUserByEmail(nextEmail);
+    if (clash) throw new Error("A user with this email already exists.");
   }
   const nextRole = updates.role || current.role;
   const nextPages = normalizePages(nextRole, updates.pages ?? current.pages);
+  const nextPasswordHash = updates.password ? hashPassword(updates.password) : current.passwordHash;
 
-  const updated: User = {
-    ...current,
-    email: nextEmail,
-    role: nextRole,
-    pages: nextPages,
-    passwordHash: updates.password ? hashPassword(updates.password) : current.passwordHash,
-  };
-  users[idx] = updated;
-  saveUsers(users);
-  return toSafe(updated);
+  const rows = await sql`
+    UPDATE users
+    SET email = ${nextEmail},
+        role = ${nextRole},
+        pages = ${JSON.stringify(nextPages)}::jsonb,
+        password_hash = ${nextPasswordHash}
+    WHERE id = ${id}
+    RETURNING *
+  `;
+  return toSafe(rowToUser(rows[0]));
 }
 
-export function deleteUser(id: string): void {
-  const users = getUsers().filter((u) => u.id !== id);
-  saveUsers(users);
+export async function deleteUser(id: string): Promise<void> {
+  await sql`DELETE FROM users WHERE id = ${id}`;
 }
 
-export function verifyUserCredentials(email: string, password: string): SafeUser | null {
-  const user = findUserByEmail(email);
+export async function verifyUserCredentials(email: string, password: string): Promise<SafeUser | null> {
+  const user = await findUserByEmail(email);
   if (!user) return null;
   if (!verifyPassword(password, user.passwordHash)) return null;
   return toSafe(user);

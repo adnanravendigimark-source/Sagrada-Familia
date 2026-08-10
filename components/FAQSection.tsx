@@ -1,7 +1,7 @@
 import { getFaqs } from "@/lib/data";
 
-export default function FAQSection() {
-  const faqs = getFaqs();
+export default async function FAQSection() {
+  const faqs = await getFaqs();
   // FAQPage structured data — makes these eligible for rich results /
   // "People also ask" boxes. Add/edit questions from /admin/faqs.
   const jsonLd = {

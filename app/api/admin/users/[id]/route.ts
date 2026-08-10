@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { getUsers, updateUser, deleteUser, type UserRole } from "@/lib/users";
 import { PAGE_KEYS, type PageKey } from "@/lib/pageAccess";
+import { DB_ERROR_MESSAGE } from "@/lib/db";
 
 async function requireAdmin() {
   const session = await getSession();
@@ -20,7 +21,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const target = getUsers().find((u) => u.id === params.id);
+  const target = (await getUsers()).find((u) => u.id === params.id);
   if (!target) {
     return NextResponse.json({ error: "User not found." }, { status: 404 });
   }
@@ -48,10 +49,12 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 
   try {
-    const updated = updateUser(params.id, { email, role, pages, password });
+    const updated = await updateUser(params.id, { email, role, pages, password });
     return NextResponse.json(updated);
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message || "Could not update user." }, { status: 400 });
+    const isDbError = typeof err === "object" && err !== null && "code" in err;
+    const message = isDbError ? DB_ERROR_MESSAGE : (err as Error).message || "Could not update user.";
+    return NextResponse.json({ error: message }, { status: isDbError ? 500 : 400 });
   }
 }
 
@@ -61,7 +64,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "Admins only." }, { status: 403 });
   }
 
-  const target = getUsers().find((u) => u.id === params.id);
+  const target = (await getUsers()).find((u) => u.id === params.id);
   if (!target) {
     return NextResponse.json({ error: "User not found." }, { status: 404 });
   }
@@ -69,6 +72,10 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "You can't delete your own account while logged in as it." }, { status: 400 });
   }
 
-  deleteUser(params.id);
+  try {
+    await deleteUser(params.id);
+  } catch {
+    return NextResponse.json({ error: DB_ERROR_MESSAGE }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

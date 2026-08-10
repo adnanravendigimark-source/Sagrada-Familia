@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import { getSafeUsers, createUser, type UserRole } from "@/lib/users";
 import { PAGE_KEYS, type PageKey } from "@/lib/pageAccess";
+import { DB_ERROR_MESSAGE } from "@/lib/db";
 
 // Middleware already restricts this whole path to role "admin", but we
 // check again here too — never trust a single layer for something that
@@ -22,7 +23,7 @@ function parsePages(input: unknown): PageKey[] {
 export async function GET() {
   const denied = await requireAdmin();
   if (denied) return denied;
-  return NextResponse.json(getSafeUsers());
+  return NextResponse.json(await getSafeUsers());
 }
 
 export async function POST(req: Request) {
@@ -52,9 +53,11 @@ export async function POST(req: Request) {
   }
 
   try {
-    const user = createUser(email, password, role, pages);
+    const user = await createUser(email, password, role, pages);
     return NextResponse.json(user);
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message || "Could not create user." }, { status: 400 });
+    const isDbError = typeof err === "object" && err !== null && "code" in err;
+    const message = isDbError ? DB_ERROR_MESSAGE : (err as Error).message || "Could not create user.";
+    return NextResponse.json({ error: message }, { status: isDbError ? 500 : 400 });
   }
 }

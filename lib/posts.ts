@@ -1,4 +1,4 @@
-import { readJson, writeJson } from "./cms";
+import { sql } from "./db";
 
 // A post's body is a simple list of typed blocks rather than raw HTML/
 // Markdown — easy for a non-technical content writer to edit in the admin
@@ -30,20 +30,104 @@ export interface Post {
   content: ContentBlock[];
 }
 
-export function getPosts(): Post[] {
-  return readJson<Post[]>("posts.json");
+function parseContent(value: unknown): ContentBlock[] {
+  if (Array.isArray(value)) return value as ContentBlock[];
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
-export function savePosts(posts: Post[]): void {
-  writeJson("posts.json", posts);
+function rowToPost(row: any): Post {
+  return {
+    slug: row.slug,
+    title: row.title,
+    metaTitle: row.meta_title,
+    metaDescription: row.meta_description,
+    category: row.category,
+    excerpt: row.excerpt,
+    quickAnswer: row.quick_answer,
+    readTime: row.read_time,
+    date: row.date,
+    image: row.image,
+    imageAlt: row.image_alt,
+    recommendedTourId: row.recommended_tour_id || "",
+    recommendedTourAfterBlock:
+      row.recommended_tour_after_block === null ? undefined : Number(row.recommended_tour_after_block),
+    content: parseContent(row.content),
+  };
 }
 
-export function getPost(slug: string): Post | undefined {
-  return getPosts().find((p) => p.slug === slug);
+export async function getPosts(): Promise<Post[]> {
+  try {
+    const rows = await sql`SELECT * FROM posts ORDER BY sort_order ASC, date DESC`;
+    return rows.map(rowToPost);
+  } catch {
+    // DATABASE_URL not set yet, or `node scripts/setup-db.mjs` hasn't been
+    // run — fail soft with an empty list instead of crashing the page.
+    return [];
+  }
 }
 
-export function getRelatedPosts(slug: string, count = 2): Post[] {
-  return getPosts()
-    .filter((p) => p.slug !== slug)
-    .slice(0, count);
+export async function getPost(slug: string): Promise<Post | undefined> {
+  try {
+    const rows = await sql`SELECT * FROM posts WHERE slug = ${slug} LIMIT 1`;
+    return rows.length ? rowToPost(rows[0]) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function getRelatedPosts(slug: string, count = 2): Promise<Post[]> {
+  const posts = await getPosts();
+  return posts.filter((p) => p.slug !== slug).slice(0, count);
+}
+
+// Replaces the full post list with exactly the given records — upserts
+// everything passed in, then removes any row not present in `posts`. This
+// matches how the admin API routes already call it (read the full list,
+// apply one change, pass the whole thing back).
+export async function savePosts(posts: Post[]): Promise<void> {
+  for (let i = 0; i < posts.length; i++) {
+    const p = posts[i];
+    await sql`
+      INSERT INTO posts (
+        slug, title, meta_title, meta_description, category, excerpt,
+        quick_answer, read_time, date, image, image_alt,
+        recommended_tour_id, recommended_tour_after_block, content, sort_order
+      ) VALUES (
+        ${p.slug}, ${p.title}, ${p.metaTitle}, ${p.metaDescription}, ${p.category},
+        ${p.excerpt}, ${p.quickAnswer}, ${p.readTime}, ${p.date}, ${p.image}, ${p.imageAlt},
+        ${p.recommendedTourId || ""}, ${p.recommendedTourAfterBlock ?? null},
+        ${JSON.stringify(p.content || [])}::jsonb, ${i}
+      )
+      ON CONFLICT (slug) DO UPDATE SET
+        title = EXCLUDED.title,
+        meta_title = EXCLUDED.meta_title,
+        meta_description = EXCLUDED.meta_description,
+        category = EXCLUDED.category,
+        excerpt = EXCLUDED.excerpt,
+        quick_answer = EXCLUDED.quick_answer,
+        read_time = EXCLUDED.read_time,
+        date = EXCLUDED.date,
+        image = EXCLUDED.image,
+        image_alt = EXCLUDED.image_alt,
+        recommended_tour_id = EXCLUDED.recommended_tour_id,
+        recommended_tour_after_block = EXCLUDED.recommended_tour_after_block,
+        content = EXCLUDED.content,
+        sort_order = EXCLUDED.sort_order
+    `;
+  }
+
+  const existing = await sql`SELECT slug FROM posts`;
+  const keepSlugs = posts.map((p) => p.slug);
+  const toDelete = existing.map((r) => r.slug as string).filter((slug) => !keepSlugs.includes(slug));
+  for (const slug of toDelete) {
+    await sql`DELETE FROM posts WHERE slug = ${slug}`;
+  }
 }

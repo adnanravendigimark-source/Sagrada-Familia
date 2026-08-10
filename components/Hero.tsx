@@ -1,4 +1,5 @@
 import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { getHomepageContent } from "@/lib/homepage";
 
 // Real, free-to-use photography from Unsplash (Unsplash License — free for
@@ -34,13 +35,13 @@ const galleryImages = [
   },
 ];
 
-export default function Hero() {
-  const content = getHomepageContent();
+export default async function Hero() {
+  const content = await getHomepageContent();
   return (
     <section id="top" className="relative overflow-hidden bg-basilica-plum text-white">
       {/* Full-bleed photo background */}
       <div className="absolute inset-0">
-        <Image
+        <SafeImage
           src={content.heroImage}
           alt={content.heroImageAlt}
           fill

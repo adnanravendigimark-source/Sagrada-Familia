@@ -9,7 +9,7 @@ const inputClass =
   "w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-basilica-teal focus:outline-none focus:ring-1 focus:ring-basilica-teal";
 const labelClass = "mb-1 block text-sm font-medium text-stone-700";
 
-export default function UserEditForm({ user }: { user: SafeUser }) {
+export default function UserEditForm({ user, onCancel }: { user: SafeUser; onCancel?: () => void }) {
   const router = useRouter();
   const [email, setEmail] = useState(user.email);
   const [role, setRole] = useState<"editor" | "admin">(user.role);
@@ -117,7 +117,13 @@ export default function UserEditForm({ user }: { user: SafeUser }) {
         </button>
         <button
           type="button"
-          onClick={() => router.push("/admin/users")}
+          onClick={() => {
+            if (onCancel) {
+              onCancel();
+              return;
+            }
+            router.push("/admin/users");
+          }}
           className="rounded-lg border border-stone-300 px-5 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-stone-50"
         >
           Cancel

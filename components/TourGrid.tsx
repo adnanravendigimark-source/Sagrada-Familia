@@ -2,9 +2,9 @@ import { getTours } from "@/lib/data";
 import { getHomepageContent } from "@/lib/homepage";
 import TourCard from "./TourCard";
 
-export default function TourGrid() {
-  const content = getHomepageContent();
-  const tours = getTours();
+export default async function TourGrid() {
+  const content = await getHomepageContent();
+  const tours = await getTours();
 
   // The admin-picked recommended tour leads the grid on desktop rather than
   // sitting wherever it happens to fall in the data file.

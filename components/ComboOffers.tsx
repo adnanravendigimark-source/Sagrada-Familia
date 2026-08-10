@@ -1,7 +1,7 @@
 import { getComboOffers } from "@/lib/data";
 
-export default function ComboOffers() {
-  const comboOffers = getComboOffers();
+export default async function ComboOffers() {
+  const comboOffers = await getComboOffers();
   return (
     <section className="bg-basilica-plum/5 py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">

@@ -3,8 +3,8 @@ import HomepageForm from "@/components/admin/HomepageForm";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminHomepagePage() {
-  const content = getHomepageContent();
+export default async function AdminHomepagePage() {
+  const content = await getHomepageContent();
 
   return (
     <div>

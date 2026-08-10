@@ -17,9 +17,9 @@ const cards: { href: string; label: string; desc: string; icon: typeof HomeIcon;
 ];
 
 export default async function AdminDashboardPage() {
-  const tours = getToursRaw();
-  const posts = getPosts();
-  const content = getHomepageContent();
+  const tours = await getToursRaw();
+  const posts = await getPosts();
+  const content = await getHomepageContent();
   const featuredTour = tours.find((t) => t.id === content.featuredTourId);
 
   const session = await getSession();

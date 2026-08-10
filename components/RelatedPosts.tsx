@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
+import SafeImage from "./SafeImage";
 import { getRelatedPosts } from "@/lib/posts";
 
-export default function RelatedPosts({ slug }: { slug: string }) {
-  const related = getRelatedPosts(slug);
+export default async function RelatedPosts({ slug }: { slug: string }) {
+  const related = await getRelatedPosts(slug);
   if (related.length === 0) return null;
 
   return (
@@ -17,7 +17,7 @@ export default function RelatedPosts({ slug }: { slug: string }) {
             className="group flex gap-4 rounded-2xl border border-stone-900/10 bg-white p-3 transition hover:shadow-md"
           >
             <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl">
-              <Image src={post.image} alt={post.imageAlt} fill sizes="100px" className="object-cover" />
+              <SafeImage src={post.image} alt={post.imageAlt} fill sizes="100px" className="object-cover" />
             </div>
             <div className="flex flex-col justify-center">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-basilica-teal">

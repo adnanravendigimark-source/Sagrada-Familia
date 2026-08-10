@@ -13,10 +13,11 @@ import { getTours } from "@/lib/data";
 // /admin — render dynamically so edits show up without a rebuild.
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
   // Product structured data for the featured guided tours — makes them
   // eligible for star-rating rich results in search.
-  const productJsonLd = getTours()
+  const tours = await getTours();
+  const productJsonLd = tours
     .filter((t) => t.featured)
     .map((t) => ({
       "@context": "https://schema.org",

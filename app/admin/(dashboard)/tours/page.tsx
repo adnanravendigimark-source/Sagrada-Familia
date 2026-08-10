@@ -1,13 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getToursRaw } from "@/lib/data";
 import { getSession } from "@/lib/session";
 import DeleteButton from "@/components/admin/DeleteButton";
+import SafeImage from "@/components/SafeImage";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminToursPage() {
-  const tours = getToursRaw();
+  const tours = await getToursRaw();
   const session = await getSession();
   const isAdmin = session?.role === "admin";
 
@@ -33,7 +33,7 @@ export default async function AdminToursPage() {
             className="flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4"
           >
             <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-stone-100">
-              <Image src={tour.image} alt={tour.imageAlt} fill sizes="80px" className="object-cover" />
+              <SafeImage src={tour.image} alt={tour.imageAlt} fill sizes="80px" className="object-cover" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-stone-900">{tour.title}</p>

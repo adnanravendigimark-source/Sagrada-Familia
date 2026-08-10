@@ -1,17 +1,18 @@
-import Image from "next/image";
+import SafeImage from "./SafeImage";
 import { getTours } from "@/lib/data";
 
 // Inline tour promo dropped mid-article — this is the highest-converting
 // spot in a blog post, since the reader is already engaged with the exact
 // question this tour answers.
-export default function RecommendedTour({ tourId }: { tourId: string }) {
-  const tour = getTours().find((t) => t.id === tourId);
+export default async function RecommendedTour({ tourId }: { tourId: string }) {
+  const tours = await getTours();
+  const tour = tours.find((t) => t.id === tourId);
   if (!tour) return null;
 
   return (
     <div className="my-8 flex flex-col gap-5 overflow-hidden rounded-2xl border border-basilica-teal/20 bg-basilica-teal/5 p-5 sm:flex-row sm:items-center">
       <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-40">
-        <Image
+        <SafeImage
           src={tour.image}
           alt={tour.imageAlt}
           fill

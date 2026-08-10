@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
@@ -7,6 +6,7 @@ import Footer from "@/components/Footer";
 import QuickAnswer from "@/components/QuickAnswer";
 import BlogPostBody from "@/components/BlogPostBody";
 import BlogSidebar from "@/components/BlogSidebar";
+import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
 
 // Fallback route for any post created from /admin/posts that doesn't have
@@ -20,13 +20,13 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const post = getPost(params.slug);
+  const post = await getPost(params.slug);
   if (!post) return {};
   return { title: post.metaTitle, description: post.metaDescription };
 }
 
-export default function Post({ params }: { params: { slug: string } }) {
-  const post = getPost(params.slug);
+export default async function Post({ params }: { params: { slug: string } }) {
+  const post = await getPost(params.slug);
   if (!post) notFound();
 
   return (
@@ -44,7 +44,7 @@ export default function Post({ params }: { params: { slug: string } }) {
             {post.title}
           </h1>
           <div className="relative mt-8 aspect-[21/9] w-full overflow-hidden rounded-2xl">
-            <Image
+            <SafeImage
               src={post.image}
               alt={post.imageAlt}
               fill

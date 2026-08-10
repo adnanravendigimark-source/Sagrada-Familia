@@ -4,8 +4,9 @@ import TourForm from "@/components/admin/TourForm";
 
 export const dynamic = "force-dynamic";
 
-export default function EditTourPage({ params }: { params: { id: string } }) {
-  const tour = getToursRaw().find((t) => t.id === params.id);
+export default async function EditTourPage({ params }: { params: { id: string } }) {
+  const tours = await getToursRaw();
+  const tour = tours.find((t) => t.id === params.id);
   if (!tour) notFound();
 
   return (

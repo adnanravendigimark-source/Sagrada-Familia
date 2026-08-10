@@ -1,24 +1,25 @@
-import Image from "next/image";
 import Link from "next/link";
+import SafeImage from "./SafeImage";
 import { getTours } from "@/lib/data";
 import { getRelatedPosts } from "@/lib/posts";
 
-export default function BlogSidebar({
+export default async function BlogSidebar({
   slug,
   recommendedTourId,
 }: {
   slug: string;
   recommendedTourId: string;
 }) {
-  const tour = getTours().find((t) => t.id === recommendedTourId);
-  const related = getRelatedPosts(slug, 3);
+  const tours = await getTours();
+  const tour = tours.find((t) => t.id === recommendedTourId);
+  const related = await getRelatedPosts(slug, 3);
 
   return (
     <aside className="space-y-8 lg:sticky lg:top-24 lg:self-start">
       {tour && (
         <div className="overflow-hidden rounded-2xl border border-stone-900/10 bg-white shadow-sm">
           <div className="relative aspect-[4/3]">
-            <Image src={tour.image} alt={tour.imageAlt} fill sizes="320px" className="object-cover" />
+            <SafeImage src={tour.image} alt={tour.imageAlt} fill sizes="320px" className="object-cover" />
             <span className="absolute left-3 top-3 rounded-full bg-gold-500 px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm">
               Recommended
             </span>
@@ -57,7 +58,7 @@ export default function BlogSidebar({
           {related.map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="group flex gap-3">
               <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg">
-                <Image src={post.image} alt={post.imageAlt} fill sizes="80px" className="object-cover" />
+                <SafeImage src={post.image} alt={post.imageAlt} fill sizes="80px" className="object-cover" />
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-basilica-teal">

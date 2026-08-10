@@ -1,13 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getPosts } from "@/lib/posts";
 import { getSession } from "@/lib/session";
 import DeleteButton from "@/components/admin/DeleteButton";
+import SafeImage from "@/components/SafeImage";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPostsPage() {
-  const posts = getPosts();
+  const posts = await getPosts();
   const session = await getSession();
   const isAdmin = session?.role === "admin";
 
@@ -33,7 +33,7 @@ export default async function AdminPostsPage() {
             className="flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4"
           >
             <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-stone-100">
-              <Image src={post.image} alt={post.imageAlt} fill sizes="80px" className="object-cover" />
+              <SafeImage src={post.image} alt={post.imageAlt} fill sizes="80px" className="object-cover" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium text-stone-900">{post.title}</p>
