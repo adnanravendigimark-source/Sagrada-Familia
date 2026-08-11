@@ -4,7 +4,7 @@ import { getPosts } from "@/lib/posts";
 import { getHomepageContent } from "@/lib/homepage";
 import { getSession } from "@/lib/session";
 import type { PageKey } from "@/lib/pageAccess";
-import { HomeIcon, StarBadgeIcon, TicketStackIcon, DocumentIcon, QuestionIcon } from "@/components/admin/icons";
+import { HomeIcon, StarBadgeIcon, TicketStackIcon, DocumentIcon, QuestionIcon, ShieldIcon, GlobeIcon } from "@/components/admin/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +14,8 @@ const cards: { href: string; label: string; desc: string; icon: typeof HomeIcon;
   { href: "/admin/tours", label: "Tours & Tickets", desc: "The bookable products shown on the homepage.", icon: TicketStackIcon, pageKey: "tours" },
   { href: "/admin/posts", label: "Blog Posts", desc: "Articles shown on /blog.", icon: DocumentIcon, pageKey: "posts" },
   { href: "/admin/faqs", label: "FAQs", desc: "Homepage FAQ accordion.", icon: QuestionIcon, pageKey: "faqs" },
+  { href: "/admin/privacy", label: "Privacy Policy", desc: "Legal page shown at /privacy-policy, linked from the footer.", icon: ShieldIcon, pageKey: "privacy" },
+  { href: "/admin/pages", label: "About / Contact / Blog SEO", desc: "Search engine indexing for the pages without their own editor.", icon: GlobeIcon, pageKey: "pages" },
 ];
 
 export default async function AdminDashboardPage() {

@@ -8,6 +8,7 @@ import BlogPostBody from "@/components/BlogPostBody";
 import BlogSidebar from "@/components/BlogSidebar";
 import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
+import { resolveRobots } from "@/lib/seo";
 
 const slug = "guided-tour-vs-audio-guide";
 
@@ -26,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "best way to visit Sagrada Familia",
     ],
     alternates: { canonical: `/blog/${slug}` },
+    robots: resolveRobots(post.noIndex),
     openGraph: {
       title: post.metaTitle,
       description: post.metaDescription,

@@ -16,6 +16,9 @@ export interface HomepageContent {
   featuredBadgeLabel: string;
   featuredUrgencyText: string;
   featuredReasons: string[];
+  // Search Engine Indexing toggle (admin-editable). false (default) =
+  // indexable (index, follow). true = noindex, nofollow. See lib/seo.ts.
+  noIndex: boolean;
 }
 
 // Used only if the `homepage` table is empty or unreachable (e.g. before
@@ -35,6 +38,7 @@ const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   featuredBadgeLabel: "Recommended",
   featuredUrgencyText: "",
   featuredReasons: [],
+  noIndex: false,
 };
 
 function parseReasons(value: unknown): string[] {
@@ -64,6 +68,7 @@ function rowToHomepage(row: any): HomepageContent {
     featuredBadgeLabel: row.featured_badge_label || "",
     featuredUrgencyText: row.featured_urgency_text || "",
     featuredReasons: parseReasons(row.featured_reasons),
+    noIndex: !!row.no_index,
   };
 }
 
@@ -81,12 +86,12 @@ export async function saveHomepageContent(data: HomepageContent): Promise<void> 
     INSERT INTO homepage (
       id, hero_badge, hero_heading, hero_subheading, hero_image, hero_image_alt,
       rating_value, rating_count, show_featured_tour, featured_tour_id,
-      featured_badge_label, featured_urgency_text, featured_reasons
+      featured_badge_label, featured_urgency_text, featured_reasons, no_index
     ) VALUES (
       1, ${data.heroBadge}, ${data.heroHeading}, ${data.heroSubheading}, ${data.heroImage},
       ${data.heroImageAlt}, ${data.ratingValue}, ${data.ratingCount}, ${!!data.showFeaturedTour},
       ${data.featuredTourId}, ${data.featuredBadgeLabel}, ${data.featuredUrgencyText},
-      ${JSON.stringify(data.featuredReasons || [])}::jsonb
+      ${JSON.stringify(data.featuredReasons || [])}::jsonb, ${!!data.noIndex}
     )
     ON CONFLICT (id) DO UPDATE SET
       hero_badge = EXCLUDED.hero_badge,
@@ -100,6 +105,7 @@ export async function saveHomepageContent(data: HomepageContent): Promise<void> 
       featured_tour_id = EXCLUDED.featured_tour_id,
       featured_badge_label = EXCLUDED.featured_badge_label,
       featured_urgency_text = EXCLUDED.featured_urgency_text,
-      featured_reasons = EXCLUDED.featured_reasons
+      featured_reasons = EXCLUDED.featured_reasons,
+      no_index = EXCLUDED.no_index
   `;
 }

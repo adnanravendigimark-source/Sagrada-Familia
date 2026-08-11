@@ -22,6 +22,7 @@ export default async function NewPostPage() {
     recommendedTourId: tours[0]?.id || "",
     recommendedTourAfterBlock: 0,
     content: [],
+    noIndex: false,
   };
 
   return (

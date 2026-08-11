@@ -2,23 +2,35 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { MailIcon, HeadsetIcon, BriefcaseIcon } from "@/components/icons";
+import { getPageIndexingSettings } from "@/lib/settings";
+import { resolveRobots } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
 
 const TITLE = "Contact Us | Sagrada Familia Guided Tours";
 const DESCRIPTION =
   "Questions about booking a Sagrada Familia guided tour, tower access, or tickets online? Reach out directly — including for partnership and affiliate inquiries.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  keywords: [
-    "contact Sagrada Familia guided tours",
-    "Sagrada Familia booking help",
-    "Sagrada Familia affiliate partnership",
-    "Sagrada Familia tour questions",
-  ],
-  alternates: { canonical: "/contact" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/contact" },
-};
+// Static title/description/OG/keywords kept exactly as before — only
+// `robots` is resolved dynamically now, per the admin-editable toggle at
+// /admin/pages, so this had to move from a static `metadata` export to
+// `generateMetadata`.
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPageIndexingSettings();
+  return {
+    title: TITLE,
+    description: DESCRIPTION,
+    keywords: [
+      "contact Sagrada Familia guided tours",
+      "Sagrada Familia booking help",
+      "Sagrada Familia affiliate partnership",
+      "Sagrada Familia tour questions",
+    ],
+    alternates: { canonical: "/contact" },
+    robots: resolveRobots(settings.contactNoIndex),
+    openGraph: { title: TITLE, description: DESCRIPTION, url: "/contact" },
+  };
+}
 
 const EMAIL = "livetravelpartner@gmail.com";
 

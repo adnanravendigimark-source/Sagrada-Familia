@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploadField from "./ImageUploadField";
+import IndexingToggle from "./IndexingToggle";
 import type { HomepageContent } from "@/lib/homepage";
 
 const inputClass =
@@ -93,6 +94,8 @@ export default function HomepageForm({ initial }: { initial: HomepageContent }) 
           <input value={content.ratingCount} onChange={(e) => update("ratingCount", e.target.value)} className={inputClass} placeholder="1,200+ reviews" />
         </div>
       </div>
+
+      <IndexingToggle checked={content.noIndex} onChange={(next) => update("noIndex", next)} />
 
       <div className="border-t border-stone-200 pt-5">
         <button

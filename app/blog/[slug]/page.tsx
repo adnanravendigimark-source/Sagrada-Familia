@@ -8,6 +8,7 @@ import BlogPostBody from "@/components/BlogPostBody";
 import BlogSidebar from "@/components/BlogSidebar";
 import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
+import { resolveRobots } from "@/lib/seo";
 
 // Fallback route for any post created from /admin/posts that doesn't have
 // its own hand-built page file (the 3 original launch articles do, for
@@ -26,6 +27,7 @@ export async function generateMetadata({
     title: post.metaTitle,
     description: post.metaDescription,
     alternates: { canonical: `/blog/${params.slug}` },
+    robots: resolveRobots(post.noIndex),
     openGraph: {
       title: post.metaTitle,
       description: post.metaDescription,

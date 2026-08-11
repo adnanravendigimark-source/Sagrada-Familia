@@ -8,6 +8,7 @@ import BlogPostBody from "@/components/BlogPostBody";
 import BlogSidebar from "@/components/BlogSidebar";
 import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
+import { resolveRobots } from "@/lib/seo";
 
 const slug = "best-time-to-visit-sagrada-familia";
 
@@ -28,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "Sagrada Familia crowds",
     ],
     alternates: { canonical: `/blog/${slug}` },
+    robots: resolveRobots(post.noIndex),
     openGraph: {
       title: post.metaTitle,
       description: post.metaDescription,

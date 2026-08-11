@@ -1,25 +1,50 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { getPosts } from "@/lib/posts";
+import { getHomepageContent } from "@/lib/homepage";
+import { getPrivacyPolicy } from "@/lib/legal";
+import { getPageIndexingSettings } from "@/lib/settings";
 
 // Auto-generated at request time (this route is dynamic by nature — it
 // reads live blog posts from the database) and served at /sitemap.xml.
 // Submit that URL in Google Search Console once the site is live.
+//
+// A URL only belongs in the sitemap if it's actually indexable — same
+// per-page "Search Engine Indexing" toggle the robots meta tag uses (see
+// lib/seo.ts). Every page is index/follow by default; a page only drops
+// out of the sitemap once its own toggle is switched off.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [homepage, policy, posts, pageSettings] = await Promise.all([
+    getHomepageContent(),
+    getPrivacyPolicy(),
+    getPosts(),
+    getPageIndexingSettings(),
+  ]);
+
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
-    { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/blog`, changeFrequency: "weekly", priority: 0.8 },
+    ...(homepage.noIndex ? [] : [{ url: `${SITE_URL}/`, changeFrequency: "weekly" as const, priority: 1 }]),
+    ...(pageSettings.aboutNoIndex
+      ? []
+      : [{ url: `${SITE_URL}/about`, changeFrequency: "monthly" as const, priority: 0.6 }]),
+    ...(pageSettings.contactNoIndex
+      ? []
+      : [{ url: `${SITE_URL}/contact`, changeFrequency: "monthly" as const, priority: 0.5 }]),
+    ...(pageSettings.blogNoIndex
+      ? []
+      : [{ url: `${SITE_URL}/blog`, changeFrequency: "weekly" as const, priority: 0.8 }]),
+    ...(policy.noIndex
+      ? []
+      : [{ url: `${SITE_URL}/privacy-policy`, changeFrequency: "yearly" as const, priority: 0.3 }]),
   ];
 
-  const posts = await getPosts();
-  const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: post.date ? new Date(post.date) : undefined,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+  const postRoutes: MetadataRoute.Sitemap = posts
+    .filter((post) => !post.noIndex)
+    .map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: post.date ? new Date(post.date) : undefined,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
 
   return [...staticRoutes, ...postRoutes];
 }

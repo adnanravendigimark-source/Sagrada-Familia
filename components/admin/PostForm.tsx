@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploadField from "./ImageUploadField";
+import IndexingToggle from "./IndexingToggle";
 import type { Post, ContentBlock, ContentBlockType } from "@/lib/posts";
 import type { Tour } from "@/lib/data";
 
@@ -350,6 +351,8 @@ export default function PostForm({
           </div>
         </div>
       </SectionCard>
+
+      <IndexingToggle checked={post.noIndex} onChange={(next) => update("noIndex", next)} />
 
       <div className="flex gap-3">
         <button

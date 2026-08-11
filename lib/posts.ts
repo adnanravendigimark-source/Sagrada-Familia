@@ -28,6 +28,10 @@ export interface Post {
   // content blocks. Leave unset/0 to not show it inline.
   recommendedTourAfterBlock?: number;
   content: ContentBlock[];
+  // Search Engine Indexing toggle (admin-editable, per post). false (the
+  // default) = indexable (index, follow). true = noindex, nofollow. See
+  // lib/seo.ts for how this combines with the site-wide toggle.
+  noIndex: boolean;
 }
 
 function parseContent(value: unknown): ContentBlock[] {
@@ -60,6 +64,7 @@ function rowToPost(row: any): Post {
     recommendedTourAfterBlock:
       row.recommended_tour_after_block === null ? undefined : Number(row.recommended_tour_after_block),
     content: parseContent(row.content),
+    noIndex: !!row.no_index,
   };
 }
 
@@ -106,12 +111,12 @@ export async function savePosts(posts: Post[]): Promise<void> {
       INSERT INTO posts (
         slug, title, meta_title, meta_description, category, excerpt,
         quick_answer, read_time, date, image, image_alt,
-        recommended_tour_id, recommended_tour_after_block, content, sort_order
+        recommended_tour_id, recommended_tour_after_block, content, sort_order, no_index
       ) VALUES (
         ${p.slug}, ${p.title}, ${p.metaTitle}, ${p.metaDescription}, ${p.category},
         ${p.excerpt}, ${p.quickAnswer}, ${p.readTime}, ${p.date}, ${p.image}, ${p.imageAlt},
         ${p.recommendedTourId || ""}, ${p.recommendedTourAfterBlock ?? null},
-        ${JSON.stringify(p.content || [])}::jsonb, ${i}
+        ${JSON.stringify(p.content || [])}::jsonb, ${i}, ${!!p.noIndex}
       )
       ON CONFLICT (slug) DO UPDATE SET
         title = EXCLUDED.title,
@@ -127,7 +132,8 @@ export async function savePosts(posts: Post[]): Promise<void> {
         recommended_tour_id = EXCLUDED.recommended_tour_id,
         recommended_tour_after_block = EXCLUDED.recommended_tour_after_block,
         content = EXCLUDED.content,
-        sort_order = EXCLUDED.sort_order
+        sort_order = EXCLUDED.sort_order,
+        no_index = EXCLUDED.no_index
     `;
   }
 

@@ -10,6 +10,8 @@ import {
   TicketStackIcon,
   DocumentIcon,
   QuestionIcon,
+  ShieldIcon,
+  GlobeIcon,
   UsersIcon,
 } from "./icons";
 
@@ -20,6 +22,8 @@ const baseNavItems: { href: string; label: string; icon: typeof GridIcon; pageKe
   { href: "/admin/tours", label: "Tours & Tickets", icon: TicketStackIcon, pageKey: "tours" },
   { href: "/admin/posts", label: "Blog Posts", icon: DocumentIcon, pageKey: "posts" },
   { href: "/admin/faqs", label: "FAQs", icon: QuestionIcon, pageKey: "faqs" },
+  { href: "/admin/privacy", label: "Privacy Policy", icon: ShieldIcon, pageKey: "privacy" },
+  { href: "/admin/pages", label: "About / Contact / Blog SEO", icon: GlobeIcon, pageKey: "pages" },
 ];
 
 const usersNavItem = { href: "/admin/users", label: "Users", icon: UsersIcon };

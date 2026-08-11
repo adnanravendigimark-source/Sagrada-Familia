@@ -3,34 +3,46 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ShieldCheckIcon, StarIcon, LockIcon, HeadsetIcon } from "@/components/icons";
+import { getPageIndexingSettings } from "@/lib/settings";
+import { resolveRobots } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
 
 const TITLE = "About Us | Sagrada Familia Guided Tour & Ticket Booking Guide";
 const DESCRIPTION =
   "Who curates our Sagrada Familia guided tours and skip-the-line tickets online, how we pick certified guides, and why a guided tour beats a bare entry ticket.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  keywords: [
-    "About Sagrada Familia tickets",
-    "Sagrada Familia guided tour guide",
-    "book Sagrada Familia tour online",
-    "certified Sagrada Familia guides",
-    "Sagrada Familia tickets online",
-  ],
-  alternates: { canonical: "/about" },
-  openGraph: {
+// Static title/description/OG/keywords kept exactly as before — only
+// `robots` is resolved dynamically now, per the admin-editable toggle at
+// /admin/pages, so this had to move from a static `metadata` export to
+// `generateMetadata`.
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPageIndexingSettings();
+  return {
     title: TITLE,
     description: DESCRIPTION,
-    url: "/about",
-    images: [
-      {
-        url: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=2000&auto=format&fit=crop",
-        alt: "Sagrada Familia basilica facade in Barcelona",
-      },
+    keywords: [
+      "About Sagrada Familia tickets",
+      "Sagrada Familia guided tour guide",
+      "book Sagrada Familia tour online",
+      "certified Sagrada Familia guides",
+      "Sagrada Familia tickets online",
     ],
-  },
-};
+    alternates: { canonical: "/about" },
+    robots: resolveRobots(settings.aboutNoIndex),
+    openGraph: {
+      title: TITLE,
+      description: DESCRIPTION,
+      url: "/about",
+      images: [
+        {
+          url: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=2000&auto=format&fit=crop",
+          alt: "Sagrada Familia basilica facade in Barcelona",
+        },
+      ],
+    },
+  };
+}
 
 const whyUs = [
   {

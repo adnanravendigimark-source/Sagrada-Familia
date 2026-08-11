@@ -120,7 +120,8 @@ async function createTables() {
       recommended_tour_id TEXT NOT NULL DEFAULT '',
       recommended_tour_after_block INTEGER,
       content JSONB NOT NULL DEFAULT '[]',
-      sort_order INTEGER NOT NULL DEFAULT 0
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      no_index BOOLEAN NOT NULL DEFAULT false
     )
   `;
 
@@ -139,6 +140,7 @@ async function createTables() {
       featured_badge_label TEXT NOT NULL DEFAULT '',
       featured_urgency_text TEXT NOT NULL DEFAULT '',
       featured_reasons JSONB NOT NULL DEFAULT '[]',
+      no_index BOOLEAN NOT NULL DEFAULT false,
       CONSTRAINT homepage_singleton CHECK (id = 1)
     )
   `;
@@ -149,6 +151,31 @@ async function createTables() {
       question TEXT NOT NULL,
       answer TEXT NOT NULL,
       sort_order INTEGER NOT NULL DEFAULT 0
+    )
+  `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS privacy_policy (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      title TEXT NOT NULL DEFAULT 'Privacy Policy',
+      last_updated TEXT NOT NULL DEFAULT '',
+      content JSONB NOT NULL DEFAULT '[]',
+      no_index BOOLEAN NOT NULL DEFAULT false,
+      CONSTRAINT privacy_policy_singleton CHECK (id = 1)
+    )
+  `;
+
+  // Per-page "Search Engine Indexing" toggle for the 3 public pages that
+  // don't have their own dedicated table (About, Contact, Blog listing —
+  // see lib/settings.ts). Defaults to false (indexable) for all three,
+  // same default as every other page's own no_index column.
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      about_no_index BOOLEAN NOT NULL DEFAULT false,
+      contact_no_index BOOLEAN NOT NULL DEFAULT false,
+      blog_no_index BOOLEAN NOT NULL DEFAULT false,
+      CONSTRAINT site_settings_singleton CHECK (id = 1)
     )
   `;
 
@@ -164,6 +191,26 @@ async function createTables() {
   `;
 
   console.log("Tables ready.");
+}
+
+// Handles databases that already existed before the per-page "Search
+// Engine Indexing" toggle was added — CREATE TABLE IF NOT EXISTS above
+// only helps on a brand-new database, it won't retroactively add a column
+// to a table that's already there. ADD COLUMN IF NOT EXISTS is safe to
+// run every time and does nothing if the column is already present.
+async function addNoIndexColumns() {
+  console.log("Ensuring no_index columns exist on posts/homepage/privacy_policy/site_settings...");
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS no_index BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS no_index BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS no_index BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS about_no_index BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS contact_no_index BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_no_index BOOLEAN NOT NULL DEFAULT false`;
+  // The old site-wide "hide the entire site from Google" master switch has
+  // been replaced by per-page toggles on every page (including these
+  // three) — drop its now-unused column.
+  await sql`ALTER TABLE site_settings DROP COLUMN IF EXISTS search_indexing_enabled`;
+  console.log("no_index columns ready.");
 }
 
 async function seedTours() {
@@ -297,6 +344,37 @@ async function seedFaqs() {
   console.log(`faqs: seeded ${faqs.length} row(s).`);
 }
 
+async function seedPrivacyPolicy() {
+  const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM privacy_policy`;
+  if (count > 0) {
+    console.log("privacy_policy: already configured — skipping seed.");
+    return;
+  }
+  const p = readJsonFile("privacy-policy.json");
+  const today = new Date().toISOString().slice(0, 10);
+  if (!p) {
+    console.log("privacy_policy: no data/privacy-policy.json to seed from — inserting defaults.");
+    await sql`INSERT INTO privacy_policy (id, last_updated) VALUES (1, ${today}) ON CONFLICT (id) DO NOTHING`;
+    return;
+  }
+  await sql`
+    INSERT INTO privacy_policy (id, title, last_updated, content)
+    VALUES (1, ${p.title || "Privacy Policy"}, ${today}, ${JSON.stringify(p.content || [])}::jsonb)
+    ON CONFLICT (id) DO NOTHING
+  `;
+  console.log("privacy_policy: seeded from data/privacy-policy.json.");
+}
+
+async function seedSiteSettings() {
+  const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM site_settings`;
+  if (count > 0) {
+    console.log("site_settings: already configured — skipping seed.");
+    return;
+  }
+  await sql`INSERT INTO site_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING`;
+  console.log("site_settings: seeded (About/Contact/Blog indexing ON by default, same as every other page).");
+}
+
 // Users are NOT seeded from data/users.json on purpose — that file may
 // contain stale/placeholder password hashes from before the DB migration.
 // Create real users from the live admin panel (Users page) instead; the
@@ -304,11 +382,14 @@ async function seedFaqs() {
 
 async function main() {
   await createTables();
+  await addNoIndexColumns();
   await seedTours();
   await seedComboOffers();
   await seedPosts();
   await seedHomepage();
   await seedFaqs();
+  await seedPrivacyPolicy();
+  await seedSiteSettings();
   console.log("\nDone. Your database is ready.");
 }
 

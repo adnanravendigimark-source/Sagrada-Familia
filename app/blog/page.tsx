@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SafeImage from "@/components/SafeImage";
 import { getPosts } from "@/lib/posts";
+import { getPageIndexingSettings } from "@/lib/settings";
+import { resolveRobots } from "@/lib/seo";
 
 // Posts now live in /data/posts.json, editable from /admin/posts — render
 // dynamically so new/edited posts show up without a rebuild.
@@ -13,20 +15,28 @@ const TITLE = "Sagrada Familia Travel Guide & Tips | Guided Tour Blog";
 const DESCRIPTION =
   "Practical Sagrada Familia guides: best time to visit, whether tower access is worth it, and guided tour vs. audio guide — written to help you book the right ticket.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  keywords: [
-    "Sagrada Familia travel guide",
-    "Sagrada Familia tips",
-    "best time to visit Sagrada Familia",
-    "Sagrada Familia tower access worth it",
-    "Sagrada Familia guided tour vs audio guide",
-    "Nativity tower vs Passion tower",
-  ],
-  alternates: { canonical: "/blog" },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: "/blog", type: "website" },
-};
+// Static title/description/OG/keywords kept exactly as before — only
+// `robots` is resolved dynamically now, per the admin-editable toggle at
+// /admin/pages, so this had to move from a static `metadata` export to
+// `generateMetadata`.
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPageIndexingSettings();
+  return {
+    title: TITLE,
+    description: DESCRIPTION,
+    keywords: [
+      "Sagrada Familia travel guide",
+      "Sagrada Familia tips",
+      "best time to visit Sagrada Familia",
+      "Sagrada Familia tower access worth it",
+      "Sagrada Familia guided tour vs audio guide",
+      "Nativity tower vs Passion tower",
+    ],
+    alternates: { canonical: "/blog" },
+    robots: resolveRobots(settings.blogNoIndex),
+    openGraph: { title: TITLE, description: DESCRIPTION, url: "/blog", type: "website" },
+  };
+}
 
 export default async function BlogIndexPage() {
   const posts = await getPosts();

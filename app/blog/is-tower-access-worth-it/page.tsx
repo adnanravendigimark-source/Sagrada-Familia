@@ -8,6 +8,7 @@ import BlogPostBody from "@/components/BlogPostBody";
 import BlogSidebar from "@/components/BlogSidebar";
 import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
+import { resolveRobots } from "@/lib/seo";
 
 const slug = "is-tower-access-worth-it";
 
@@ -27,6 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "Nativity tower vs Passion tower",
     ],
     alternates: { canonical: `/blog/${slug}` },
+    robots: resolveRobots(post.noIndex),
     openGraph: {
       title: post.metaTitle,
       description: post.metaDescription,

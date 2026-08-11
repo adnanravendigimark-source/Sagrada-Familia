@@ -82,11 +82,20 @@ export function UsersIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
-export function ComboIcon({ className = "h-5 w-5" }: IconProps) {
+export function ShieldIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.7}>
-      <circle cx="9.5" cy="12" r="6" />
-      <circle cx="14.5" cy="12" r="6" />
+      <path d="M12 3.5 5 6v5.5c0 4.4 3 8 7 9 4-1 7-4.6 7-9V6l-7-2.5Z" strokeLinejoin="round" />
+      <path d="M9 12.2 11.2 14.4 15.5 10" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function GlobeIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.7}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.5 12h17M12 3.5c2.4 2.3 3.7 5.2 3.7 8.5s-1.3 6.2-3.7 8.5c-2.4-2.3-3.7-5.2-3.7-8.5S9.6 5.8 12 3.5Z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

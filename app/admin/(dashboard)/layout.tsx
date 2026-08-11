@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/Logo.png";
@@ -5,6 +6,14 @@ import { getSession } from "@/lib/session";
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { AdminSidebarNav, AdminMobileNav } from "@/components/admin/AdminNav";
 import { ExternalLinkIcon } from "@/components/admin/icons";
+
+// Belt-and-suspenders alongside the X-Robots-Tag header middleware already
+// sets on every /admin response — this covers the <meta name="robots">
+// tag specifically, in case anything ever reads/renders this HTML outside
+// that middleware's reach. Applies to every page under this layout.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();

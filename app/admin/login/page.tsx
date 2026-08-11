@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 import LoginForm from "@/components/admin/LoginForm";
 
-export const metadata = { title: "Admin Login | Sagrada Familia Guided Tours" };
+export const metadata = {
+  title: "Admin Login | Sagrada Familia Guided Tours",
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default function AdminLoginPage() {
   return (

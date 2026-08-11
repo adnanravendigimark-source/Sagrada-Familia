@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
+import { resolveRobots } from "@/lib/seo";
 import "./globals.css";
+
+// Forces every page in the app to render dynamically, root layout included
+// — most pages already set this individually for CMS-freshness reasons,
+// but About/Contact didn't, which would let their metadata (and therefore
+// the search-indexing toggle below) get cached at build time instead of
+// re-checked on every request. Setting it here at the root guarantees the
+// toggle takes effect immediately everywhere, no rebuild required.
+export const dynamic = "force-dynamic";
 
 // Real display typeface (was falling back to plain system Georgia before —
 // that's what made the header wordmark look "very normal"). Loaded once
@@ -53,49 +62,62 @@ const websiteJsonLd = {
   url: SITE_URL,
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  // Kept under 60 characters so Google doesn't truncate it in results.
-  title: {
-    default: "Sagrada Familia Guided Tours & Tickets (2026)",
-    template: "%s | Sagrada Familia Guided Tours",
-  },
-  // Kept under 155 characters for the same reason.
-  description:
-    "Compare Sagrada Familia guided tours and skip-the-line tickets. Certified local guides, tower access, and instant online booking for 2026.",
-  keywords: [
-    "Sagrada Familia guided tour",
-    "Sagrada Familia tower access",
-    "Sagrada Familia tickets",
-    "book Sagrada Familia tour",
-    "Sagrada Familia tour price",
-    "Sagrada Familia tickets online",
-    "skip the line Sagrada Familia",
-    "Sagrada Familia skip the line tickets",
-    "Nativity tower vs Passion tower",
-    "is a guided tour worth it Sagrada Familia",
-    "Barcelona guided tours",
-  ],
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Sagrada Familia Guided Tours & Tickets | Skip the Line + Tower Access",
+// Search indexing is controlled entirely by each page's own "Search
+// Engine Indexing" admin toggle, resolved via lib/seo.ts's
+// resolveRobots(). This root layout has no page of its own, so it
+// resolves with no noIndex (false, i.e. index/follow) — every public
+// page below it either inherits this default (if it doesn't define its
+// own `robots`) or overrides it with its own resolveRobots() call (if it
+// has a per-page toggle — see app/page.tsx, app/about/page.tsx,
+// app/contact/page.tsx, app/blog/**, app/privacy-policy/page.tsx).
+export function generateMetadata(): Metadata {
+  const robots = resolveRobots(false);
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    // Kept under 60 characters so Google doesn't truncate it in results.
+    title: {
+      default: "Sagrada Familia Guided Tours & Tickets (2026)",
+      template: "%s | Sagrada Familia Guided Tours",
+    },
+    // Kept under 155 characters for the same reason.
     description:
-      "Certified guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
-    type: "website",
-    url: SITE_URL,
-    siteName: "Sagrada Familia Guided Tours",
-    images: [{ url: DEFAULT_OG_IMAGE, width: 2400, height: 1350, alt: "Sagrada Familia basilica interior" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Sagrada Familia Guided Tours & Tickets | Skip the Line + Tower Access",
-    description:
-      "Certified guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
-    images: [DEFAULT_OG_IMAGE],
-  },
-};
+      "Compare Sagrada Familia guided tours and skip-the-line tickets. Certified local guides, tower access, and instant online booking for 2026.",
+    keywords: [
+      "Sagrada Familia guided tour",
+      "Sagrada Familia tower access",
+      "Sagrada Familia tickets",
+      "book Sagrada Familia tour",
+      "Sagrada Familia tour price",
+      "Sagrada Familia tickets online",
+      "skip the line Sagrada Familia",
+      "Sagrada Familia skip the line tickets",
+      "Nativity tower vs Passion tower",
+      "is a guided tour worth it Sagrada Familia",
+      "Barcelona guided tours",
+    ],
+    alternates: {
+      canonical: "/",
+    },
+    robots,
+    openGraph: {
+      title: "Sagrada Familia Guided Tours & Tickets | Skip the Line + Tower Access",
+      description:
+        "Certified guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
+      type: "website",
+      url: SITE_URL,
+      siteName: "Sagrada Familia Guided Tours",
+      images: [{ url: DEFAULT_OG_IMAGE, width: 2400, height: 1350, alt: "Sagrada Familia basilica interior" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Sagrada Familia Guided Tours & Tickets | Skip the Line + Tower Access",
+      description:
+        "Certified guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
+      images: [DEFAULT_OG_IMAGE],
+    },
+  };
+}
 
 export default function RootLayout({
   children,
