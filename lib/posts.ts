@@ -65,7 +65,14 @@ function rowToPost(row: any): Post {
 
 export async function getPosts(): Promise<Post[]> {
   try {
-    const rows = await sql`SELECT * FROM posts ORDER BY sort_order ASC, date DESC`;
+    // Newest publish date first — posts have no manual drag-to-reorder UI
+    // (unlike tours), so `sort_order` here is just insertion order, which
+    // meant every newly published post silently landed at the very end of
+    // the list (last card in the grid, never the featured post) no matter
+    // how recent it was. Sorting by date instead means a new post always
+    // becomes the featured article at the top of /blog, which is what
+    // "publishing a post" should actually do.
+    const rows = await sql`SELECT * FROM posts ORDER BY date DESC, sort_order ASC`;
     return rows.map(rowToPost);
   } catch {
     // DATABASE_URL not set yet, or `node scripts/setup-db.mjs` hasn't been

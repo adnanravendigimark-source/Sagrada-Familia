@@ -22,8 +22,10 @@ export default function WhyGuidedTour() {
           What You Actually Get on a Guided Tour
         </h2>
         <p className="mt-3 max-w-2xl text-stone-900/70">
-          A ticket gets you through the door. A guide is the difference between looking at the
-          basilica and understanding it. Here's what a typical 2-hour guided tour covers.
+          Walk in with just a ticket and you'll see an impressive building. Walk in with a guide
+          and someone points out why the columns lean like trees, which carvings tell which Bible
+          story, and what's still being built 140 years later. Here's what a typical 2-hour tour
+          covers, hour by hour.
         </p>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-2">

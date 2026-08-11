@@ -9,17 +9,23 @@ import { getPosts } from "@/lib/posts";
 // dynamically so new/edited posts show up without a rebuild.
 export const dynamic = "force-dynamic";
 
+const TITLE = "Sagrada Familia Travel Guide & Tips | Guided Tour Blog";
+const DESCRIPTION =
+  "Practical Sagrada Familia guides: best time to visit, whether tower access is worth it, and guided tour vs. audio guide — written to help you book the right ticket.";
+
 export const metadata: Metadata = {
-  title: "Sagrada Familia Travel Guide & Tips | Guided Tour Blog",
-  description:
-    "Practical Sagrada Familia guides: best time to visit, whether tower access is worth it, and guided tour vs. audio guide — written to help you book the right ticket.",
+  title: TITLE,
+  description: DESCRIPTION,
   keywords: [
     "Sagrada Familia travel guide",
     "Sagrada Familia tips",
     "best time to visit Sagrada Familia",
     "Sagrada Familia tower access worth it",
     "Sagrada Familia guided tour vs audio guide",
+    "Nativity tower vs Passion tower",
   ],
+  alternates: { canonical: "/blog" },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/blog", type: "website" },
 };
 
 export default async function BlogIndexPage() {
@@ -119,7 +125,7 @@ export default async function BlogIndexPage() {
             href="/#tours"
             className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
           >
-            Compare Tours &amp; Tickets →
+            Compare Sagrada Familia Guided Tours &amp; Tickets →
           </a>
         </div>
       </main>

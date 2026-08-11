@@ -25,6 +25,14 @@ export async function generateMetadata(): Promise<Metadata> {
       "Sagrada Familia live guide",
       "best way to visit Sagrada Familia",
     ],
+    alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      title: post.metaTitle,
+      description: post.metaDescription,
+      url: `/blog/${slug}`,
+      type: "article",
+      images: post.image ? [{ url: post.image, alt: post.imageAlt }] : undefined,
+    },
   };
 }
 

@@ -82,6 +82,15 @@ export function UsersIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function ComboIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.7}>
+      <circle cx="9.5" cy="12" r="6" />
+      <circle cx="14.5" cy="12" r="6" />
+    </svg>
+  );
+}
+
 export function LogoutIcon({ className = "h-4 w-4" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.8}>

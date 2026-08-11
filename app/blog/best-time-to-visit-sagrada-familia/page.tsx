@@ -27,6 +27,14 @@ export async function generateMetadata(): Promise<Metadata> {
       "when to visit Sagrada Familia",
       "Sagrada Familia crowds",
     ],
+    alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      title: post.metaTitle,
+      description: post.metaDescription,
+      url: `/blog/${slug}`,
+      type: "article",
+      images: post.image ? [{ url: post.image, alt: post.imageAlt }] : undefined,
+    },
   };
 }
 
@@ -79,7 +87,7 @@ export default async function Post() {
                 href="/#tours"
                 className="mt-4 inline-flex rounded-full bg-basilica-terracotta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
               >
-                Compare Guided Tours
+                Compare Sagrada Familia Guided Tours
               </Link>
             </div>
           </div>

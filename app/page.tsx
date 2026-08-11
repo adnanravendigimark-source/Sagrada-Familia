@@ -4,6 +4,7 @@ import FeaturedTour from "@/components/FeaturedTour";
 import TourGrid from "@/components/TourGrid";
 import WhyGuidedTour from "@/components/WhyGuidedTour";
 import TowerAccess from "@/components/TowerAccess";
+import PracticalInfo from "@/components/PracticalInfo";
 import PriceComparison from "@/components/PriceComparison";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
@@ -47,6 +48,7 @@ export default async function HomePage() {
         <TourGrid />
         <WhyGuidedTour />
         <TowerAccess />
+        <PracticalInfo />
         <PriceComparison />
         <FAQSection />
         {/* Spacer so the mobile sticky booking bar never covers the footer */}

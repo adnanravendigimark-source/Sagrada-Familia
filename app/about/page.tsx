@@ -4,10 +4,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ShieldCheckIcon, StarIcon, LockIcon, HeadsetIcon } from "@/components/icons";
 
+const TITLE = "About Us | Sagrada Familia Guided Tour & Ticket Booking Guide";
+const DESCRIPTION =
+  "Who curates our Sagrada Familia guided tours and skip-the-line tickets online, how we pick certified guides, and why a guided tour beats a bare entry ticket.";
+
 export const metadata: Metadata = {
-  title: "About Us | Sagrada Familia Guided Tour & Ticket Booking Guide",
-  description:
-    "Who curates our Sagrada Familia guided tours and skip-the-line tickets online, how we pick certified guides, and why a guided tour beats a bare entry ticket.",
+  title: TITLE,
+  description: DESCRIPTION,
   keywords: [
     "About Sagrada Familia tickets",
     "Sagrada Familia guided tour guide",
@@ -15,6 +18,18 @@ export const metadata: Metadata = {
     "certified Sagrada Familia guides",
     "Sagrada Familia tickets online",
   ],
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "/about",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=2000&auto=format&fit=crop",
+        alt: "Sagrada Familia basilica facade in Barcelona",
+      },
+    ],
+  },
 };
 
 const whyUs = [
@@ -146,7 +161,7 @@ export default function AboutPage() {
               href="/#tours"
               className="shrink-0 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
             >
-              Compare Tours &amp; Tickets →
+              Compare Sagrada Familia Guided Tours →
             </a>
           </div>
 

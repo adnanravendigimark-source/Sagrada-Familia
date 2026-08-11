@@ -3,19 +3,24 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { MailIcon, HeadsetIcon, BriefcaseIcon } from "@/components/icons";
 
+const TITLE = "Contact Us | Sagrada Familia Guided Tours";
+const DESCRIPTION =
+  "Questions about booking a Sagrada Familia guided tour, tower access, or tickets online? Reach out directly — including for partnership and affiliate inquiries.";
+
 export const metadata: Metadata = {
-  title: "Contact Us | Sagrada Familia Guided Tours",
-  description:
-    "Questions about booking a Sagrada Familia guided tour, tower access, or tickets online? Reach out directly — including for partnership and affiliate inquiries.",
+  title: TITLE,
+  description: DESCRIPTION,
   keywords: [
     "contact Sagrada Familia guided tours",
     "Sagrada Familia booking help",
     "Sagrada Familia affiliate partnership",
     "Sagrada Familia tour questions",
   ],
+  alternates: { canonical: "/contact" },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: "/contact" },
 };
 
-const EMAIL = "partnership.affiliateinfo@gmail.com";
+const EMAIL = "livetravelpartner@gmail.com";
 
 const reasons = [
   {
@@ -94,7 +99,7 @@ export default function ContactPage() {
             href="/#tours"
             className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
           >
-            Compare Guided Tours &amp; Tickets →
+            Compare Sagrada Familia Tours &amp; Skip-the-Line Tickets →
           </a>
         </div>
       </main>

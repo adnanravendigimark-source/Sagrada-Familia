@@ -7,12 +7,12 @@
   "ratingValue": "4.8 / 5",
   "ratingCount": "1,200+ reviews",
   "showFeaturedTour": true,
-  "featuredTourId": "skip-the-line-ticket",
+  "featuredTourId": "fast-track-guided-tour",
   "featuredBadgeLabel": "Recommended",
   "featuredUrgencyText": "Best Price · Limited Availability",
   "featuredReasons": [
-    "Skip the guesswork — our top-booked option",
-    "Certified guide, not just fast-track entry",
+    "Our most-booked tour — 18,000+ reviews, averaging 5 stars",
+    "A real person guides you through, not an audio track in your ear",
     "Free cancellation up to 24 hours before"
   ]
 }

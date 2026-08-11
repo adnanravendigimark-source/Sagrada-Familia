@@ -22,7 +22,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const post = await getPost(params.slug);
   if (!post) return {};
-  return { title: post.metaTitle, description: post.metaDescription };
+  return {
+    title: post.metaTitle,
+    description: post.metaDescription,
+    alternates: { canonical: `/blog/${params.slug}` },
+    openGraph: {
+      title: post.metaTitle,
+      description: post.metaDescription,
+      url: `/blog/${params.slug}`,
+      type: "article",
+      images: post.image ? [{ url: post.image, alt: post.imageAlt }] : undefined,
+    },
+  };
 }
 
 export default async function Post({ params }: { params: { slug: string } }) {

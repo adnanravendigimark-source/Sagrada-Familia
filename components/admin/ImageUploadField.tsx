@@ -2,8 +2,8 @@
 
 import { useRef, useState } from "react";
 
-// Reusable image field: paste a URL directly, or upload a file (saved to
-// /public/uploads by the API route) which fills the URL in automatically.
+// Reusable image field: paste a URL directly, or upload a file (stored in
+// Vercel Blob by the API route) which fills the URL in automatically.
 export default function ImageUploadField({
   label,
   value,

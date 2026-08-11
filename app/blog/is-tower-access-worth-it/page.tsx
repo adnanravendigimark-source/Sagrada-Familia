@@ -24,7 +24,16 @@ export async function generateMetadata(): Promise<Metadata> {
       "Sagrada Familia tower ticket",
       "Sagrada Familia Passion tower",
       "Sagrada Familia Nativity tower",
+      "Nativity tower vs Passion tower",
     ],
+    alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      title: post.metaTitle,
+      description: post.metaDescription,
+      url: `/blog/${slug}`,
+      type: "article",
+      images: post.image ? [{ url: post.image, alt: post.imageAlt }] : undefined,
+    },
   };
 }
 
