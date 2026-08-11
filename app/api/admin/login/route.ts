@@ -4,15 +4,53 @@ import { verifyUserCredentials } from "@/lib/users";
 import { PAGE_KEYS } from "@/lib/pageAccess";
 import { DB_ERROR_MESSAGE } from "@/lib/db";
 
+// Verifies a Turnstile token with Cloudflare's siteverify endpoint. Returns
+// true if TURNSTILE_SECRET_KEY isn't set at all (captcha not configured —
+// don't lock everyone out), false for any actual failure/error so a bad or
+// missing token always blocks the login.
+async function verifyCaptcha(token: string, ip: string | null): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true;
+  if (!token) return false;
+
+  try {
+    const form = new URLSearchParams();
+    form.append("secret", secret);
+    form.append("response", token);
+    if (ip) form.append("remoteip", ip);
+
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: form.toString(),
+    });
+    const data = await res.json();
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   let email = "";
   let password = "";
+  let captchaToken = "";
   try {
     const body = await req.json();
     email = (body.email || "").trim();
     password = body.password || "";
+    captchaToken = body.captchaToken || "";
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
+
+  const ip = req.headers.get("x-forwarded-for");
+  const captchaOk = await verifyCaptcha(captchaToken, ip);
+  if (!captchaOk) {
+    return NextResponse.json(
+      { error: "Captcha verification failed. Please try again." },
+      { status: 400 }
+    );
   }
 
   const rootEmail = process.env.ADMIN_EMAIL;
