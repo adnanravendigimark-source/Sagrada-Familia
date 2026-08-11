@@ -25,8 +25,15 @@ async function verifyCaptcha(token: string, ip: string | null): Promise<boolean>
       body: form.toString(),
     });
     const data = await res.json();
+    if (data.success !== true) {
+      // Logged so the real reason (bad-hostname, invalid-input-response,
+      // timeout-or-duplicate, etc.) shows up in Vercel's function logs
+      // instead of just a generic "failed" on the client.
+      console.error("[turnstile] verification failed:", data["error-codes"] || data);
+    }
     return data.success === true;
-  } catch {
+  } catch (err) {
+    console.error("[turnstile] siteverify request threw:", err);
     return false;
   }
 }
@@ -44,7 +51,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const ip = req.headers.get("x-forwarded-for");
+  // x-forwarded-for on Vercel can be a comma-separated chain (client, then
+  // internal proxies) — Cloudflare's remoteip param wants a single address,
+  // so only pass the first (the real client IP).
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : null;
   const captchaOk = await verifyCaptcha(captchaToken, ip);
   if (!captchaOk) {
     return NextResponse.json(
