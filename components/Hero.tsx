@@ -54,19 +54,19 @@ export default async function Hero() {
         <div className="absolute inset-0 bg-mosaic mix-blend-soft-light" aria-hidden="true" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+      <div className="relative mx-auto max-w-6xl px-4 py-24 [@media(max-height:900px)]:py-10 sm:px-6 sm:py-32 sm:[@media(max-height:900px)]:py-14">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold-400 backdrop-blur-sm">
           {content.heroBadge}
         </p>
 
-        <h1 className="mt-6 max-w-3xl font-display text-4xl font-bold leading-[1.1] tracking-tight drop-shadow-sm sm:text-6xl">
+        <h1 className="mt-6 max-w-3xl font-display text-4xl font-bold leading-[1.1] tracking-tight drop-shadow-sm sm:text-6xl [@media(max-height:900px)]:mt-3">
           {content.heroHeading}
         </h1>
-        <p className="mt-5 max-w-2xl text-lg text-white/90 drop-shadow-sm">
+        <p className="mt-5 max-w-2xl text-lg text-white/90 drop-shadow-sm [@media(max-height:900px)]:mt-2">
           {content.heroSubheading}
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-4">
+        <div className="mt-8 flex flex-wrap items-center gap-4 [@media(max-height:900px)]:mt-4">
           <a
             href="#tours"
             className="group inline-flex items-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-basilica-terracotta/90"
@@ -92,7 +92,7 @@ export default async function Hero() {
         </div>
 
         {/* Real photo strip — facade, towers, skyline, sunset */}
-        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4 [@media(max-height:900px)]:mt-6">
           {galleryImages.map((img) => (
             <div
               key={img.label}

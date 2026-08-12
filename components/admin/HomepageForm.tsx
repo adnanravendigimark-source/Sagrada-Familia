@@ -96,6 +96,9 @@ export default function HomepageForm({ initial }: { initial: HomepageContent }) 
         </div>
       </div>
 
+      {/* Local state only, like every other field on this form — persisted
+          together with everything else when "Save Changes" is clicked
+          below. See IndexingToggle for what ON/OFF actually mean. */}
       <IndexingToggle checked={content.noIndex} onChange={(next) => update("noIndex", next)} />
 
       <div className="border-t border-stone-200 pt-5">

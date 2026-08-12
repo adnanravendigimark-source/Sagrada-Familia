@@ -157,6 +157,9 @@ export default function PrivacyPolicyForm({
         </div>
       </div>
 
+      {/* Local state only, like the title/content above — persisted
+          together with everything else when "Save Changes" is clicked
+          below. */}
       <IndexingToggle checked={noIndex} onChange={(next) => { setNoIndex(next); setSaved(false); }} />
 
       <div className="flex gap-3">

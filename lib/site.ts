@@ -2,4 +2,4 @@
 // layout (metadataBase, canonical/OG URL resolution), sitemap.xml, and
 // robots.txt. When you attach a custom domain in Vercel, change it here
 // once and every page/URL that depends on it updates automatically.
-export const SITE_URL = "https://sagrada-familia-22ko-iota.vercel.app";
+export const SITE_URL = "https://www.sagrada-familia-tour.com";

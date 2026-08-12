@@ -352,6 +352,9 @@ export default function PostForm({
         </div>
       </SectionCard>
 
+      {/* Local state only, like every other field on this form —
+          persisted together with everything else when "Publish
+          Post"/"Save Changes" is clicked below. */}
       <IndexingToggle checked={post.noIndex} onChange={(next) => update("noIndex", next)} />
 
       <div className="flex gap-3">
