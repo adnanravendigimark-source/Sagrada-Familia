@@ -34,9 +34,10 @@ export default async function Hero() {
         <h1 className="mt-6 max-w-3xl font-display text-4xl font-bold leading-[1.1] tracking-tight drop-shadow-sm sm:text-6xl [@media(max-height:900px)]:mt-3">
           {content.heroHeading}
         </h1>
-        <p className="mt-5 max-w-2xl text-lg text-white/90 drop-shadow-sm [@media(max-height:900px)]:mt-2">
-          {content.heroSubheading}
-        </p>
+        <div
+          className="rich-content rich-content-invert mt-5 max-w-2xl text-lg text-white/90 drop-shadow-sm [@media(max-height:900px)]:mt-2"
+          dangerouslySetInnerHTML={{ __html: content.heroSubheading }}
+        />
 
         <div className="mt-8 flex flex-wrap items-center gap-4 [@media(max-height:900px)]:mt-4">
           <a
