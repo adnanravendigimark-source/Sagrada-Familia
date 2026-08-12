@@ -121,7 +121,12 @@ async function createTables() {
       recommended_tour_after_block INTEGER,
       content JSONB NOT NULL DEFAULT '[]',
       sort_order INTEGER NOT NULL DEFAULT 0,
-      no_index BOOLEAN NOT NULL DEFAULT false
+      no_index BOOLEAN NOT NULL DEFAULT false,
+      no_follow BOOLEAN NOT NULL DEFAULT false,
+      canonical_url TEXT NOT NULL DEFAULT '',
+      og_title TEXT NOT NULL DEFAULT '',
+      og_description TEXT NOT NULL DEFAULT '',
+      og_image TEXT NOT NULL DEFAULT ''
     )
   `;
 
@@ -141,6 +146,11 @@ async function createTables() {
       featured_urgency_text TEXT NOT NULL DEFAULT '',
       featured_reasons JSONB NOT NULL DEFAULT '[]',
       no_index BOOLEAN NOT NULL DEFAULT false,
+      no_follow BOOLEAN NOT NULL DEFAULT false,
+      canonical_url TEXT NOT NULL DEFAULT '',
+      og_title TEXT NOT NULL DEFAULT '',
+      og_description TEXT NOT NULL DEFAULT '',
+      og_image TEXT NOT NULL DEFAULT '',
       CONSTRAINT homepage_singleton CHECK (id = 1)
     )
   `;
@@ -161,20 +171,93 @@ async function createTables() {
       last_updated TEXT NOT NULL DEFAULT '',
       content JSONB NOT NULL DEFAULT '[]',
       no_index BOOLEAN NOT NULL DEFAULT false,
+      no_follow BOOLEAN NOT NULL DEFAULT false,
+      canonical_url TEXT NOT NULL DEFAULT '',
+      meta_title TEXT NOT NULL DEFAULT '',
+      meta_description TEXT NOT NULL DEFAULT '',
+      og_title TEXT NOT NULL DEFAULT '',
+      og_description TEXT NOT NULL DEFAULT '',
+      og_image TEXT NOT NULL DEFAULT '',
       CONSTRAINT privacy_policy_singleton CHECK (id = 1)
     )
   `;
 
-  // Per-page "Search Engine Indexing" toggle for the 3 public pages that
-  // don't have their own dedicated table (About, Contact, Blog listing —
-  // see lib/settings.ts). Defaults to false (indexable) for all three,
-  // same default as every other page's own no_index column.
+  // Full SEO fields for the About page — every field admin-editable at
+  // /admin/about (see lib/about.ts).
+  await sql`
+    CREATE TABLE IF NOT EXISTS about_page (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      hero_eyebrow TEXT NOT NULL DEFAULT '',
+      hero_heading TEXT NOT NULL DEFAULT '',
+      hero_subheading TEXT NOT NULL DEFAULT '',
+      hero_image TEXT NOT NULL DEFAULT '',
+      hero_image_alt TEXT NOT NULL DEFAULT '',
+      intro_heading TEXT NOT NULL DEFAULT '',
+      intro_paragraph_1 TEXT NOT NULL DEFAULT '',
+      intro_paragraph_2 TEXT NOT NULL DEFAULT '',
+      intro_image TEXT NOT NULL DEFAULT '',
+      intro_image_alt TEXT NOT NULL DEFAULT '',
+      reasons_heading TEXT NOT NULL DEFAULT '',
+      reasons_subheading TEXT NOT NULL DEFAULT '',
+      reasons JSONB NOT NULL DEFAULT '[]',
+      disclosure_heading TEXT NOT NULL DEFAULT '',
+      disclosure_body TEXT NOT NULL DEFAULT '',
+      cta_text TEXT NOT NULL DEFAULT '',
+      cta_button_label TEXT NOT NULL DEFAULT '',
+      meta_title TEXT NOT NULL DEFAULT '',
+      meta_description TEXT NOT NULL DEFAULT '',
+      canonical_url TEXT NOT NULL DEFAULT '',
+      no_index BOOLEAN NOT NULL DEFAULT false,
+      no_follow BOOLEAN NOT NULL DEFAULT false,
+      og_title TEXT NOT NULL DEFAULT '',
+      og_description TEXT NOT NULL DEFAULT '',
+      og_image TEXT NOT NULL DEFAULT '',
+      CONSTRAINT about_page_singleton CHECK (id = 1)
+    )
+  `;
+
+  // Full SEO fields for the Contact page — every field admin-editable at
+  // /admin/contact (see lib/contact.ts).
+  await sql`
+    CREATE TABLE IF NOT EXISTS contact_page (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      hero_eyebrow TEXT NOT NULL DEFAULT '',
+      hero_heading TEXT NOT NULL DEFAULT '',
+      hero_subheading TEXT NOT NULL DEFAULT '',
+      email TEXT NOT NULL DEFAULT '',
+      email_note TEXT NOT NULL DEFAULT '',
+      reasons_heading TEXT NOT NULL DEFAULT '',
+      reasons JSONB NOT NULL DEFAULT '[]',
+      footer_note TEXT NOT NULL DEFAULT '',
+      cta_heading TEXT NOT NULL DEFAULT '',
+      cta_button_label TEXT NOT NULL DEFAULT '',
+      meta_title TEXT NOT NULL DEFAULT '',
+      meta_description TEXT NOT NULL DEFAULT '',
+      canonical_url TEXT NOT NULL DEFAULT '',
+      no_index BOOLEAN NOT NULL DEFAULT false,
+      no_follow BOOLEAN NOT NULL DEFAULT false,
+      og_title TEXT NOT NULL DEFAULT '',
+      og_description TEXT NOT NULL DEFAULT '',
+      og_image TEXT NOT NULL DEFAULT '',
+      CONSTRAINT contact_page_singleton CHECK (id = 1)
+    )
+  `;
+
+  // Full SEO fields for the Blog listing page — the one remaining public
+  // page with no dedicated content table (see lib/settings.ts). About and
+  // Contact used to share this table via *_no_index columns before they
+  // got their own dedicated tables above.
   await sql`
     CREATE TABLE IF NOT EXISTS site_settings (
       id INTEGER PRIMARY KEY DEFAULT 1,
-      about_no_index BOOLEAN NOT NULL DEFAULT false,
-      contact_no_index BOOLEAN NOT NULL DEFAULT false,
       blog_no_index BOOLEAN NOT NULL DEFAULT false,
+      blog_no_follow BOOLEAN NOT NULL DEFAULT false,
+      blog_meta_title TEXT NOT NULL DEFAULT '',
+      blog_meta_description TEXT NOT NULL DEFAULT '',
+      blog_canonical_url TEXT NOT NULL DEFAULT '',
+      blog_og_title TEXT NOT NULL DEFAULT '',
+      blog_og_description TEXT NOT NULL DEFAULT '',
+      blog_og_image TEXT NOT NULL DEFAULT '',
       CONSTRAINT site_settings_singleton CHECK (id = 1)
     )
   `;
@@ -199,18 +282,91 @@ async function createTables() {
 // to a table that's already there. ADD COLUMN IF NOT EXISTS is safe to
 // run every time and does nothing if the column is already present.
 async function addNoIndexColumns() {
-  console.log("Ensuring no_index columns exist on posts/homepage/privacy_policy/site_settings...");
+  console.log("Ensuring no_index columns exist on posts/homepage/privacy_policy...");
   await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS no_index BOOLEAN NOT NULL DEFAULT false`;
   await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS no_index BOOLEAN NOT NULL DEFAULT false`;
   await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS no_index BOOLEAN NOT NULL DEFAULT false`;
-  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS about_no_index BOOLEAN NOT NULL DEFAULT false`;
-  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS contact_no_index BOOLEAN NOT NULL DEFAULT false`;
-  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_no_index BOOLEAN NOT NULL DEFAULT false`;
-  // The old site-wide "hide the entire site from Google" master switch has
-  // been replaced by per-page toggles on every page (including these
-  // three) — drop its now-unused column.
-  await sql`ALTER TABLE site_settings DROP COLUMN IF EXISTS search_indexing_enabled`;
   console.log("no_index columns ready.");
+}
+
+// Full SEO field rollout (canonical URL, independent "Link Following"
+// toggle, Open Graph overrides) on every table that already existed
+// before these columns were added. Safe to re-run — ADD COLUMN IF NOT
+// EXISTS is a no-op when the column is already there, so this never
+// touches content you've already edited through the live admin panel.
+async function addSeoColumns() {
+  console.log("Ensuring SEO columns (canonical/follow/OG) exist on posts/homepage/privacy_policy...");
+
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS no_follow BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS canonical_url TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS og_title TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS og_description TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS og_image TEXT NOT NULL DEFAULT ''`;
+
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS no_follow BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS canonical_url TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS og_title TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS og_description TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS og_image TEXT NOT NULL DEFAULT ''`;
+
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS no_follow BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS canonical_url TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS og_title TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS og_description TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS og_image TEXT NOT NULL DEFAULT ''`;
+
+  // privacy_policy additionally gets its own meta_title/meta_description —
+  // every other content type already had these from the start.
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS meta_title TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE privacy_policy ADD COLUMN IF NOT EXISTS meta_description TEXT NOT NULL DEFAULT ''`;
+
+  // site_settings: About/Contact moved to their own dedicated tables
+  // (about_page/contact_page, created above) so they can hold full
+  // content, not just an indexing toggle. Add the new Blog-only SEO
+  // columns, then drop the old about_no_index/contact_no_index columns —
+  // any pre-existing value there is carried forward manually below before
+  // the drop, so a site that had already toggled About/Contact noindex
+  // doesn't silently lose that setting.
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_no_index BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_no_follow BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_meta_title TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_meta_description TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_canonical_url TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_og_title TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_og_description TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_og_image TEXT NOT NULL DEFAULT ''`;
+
+  // The old site-wide "hide the entire site from Google" master switch has
+  // been replaced by per-page toggles on every page — drop its now-unused
+  // column (a leftover from before that migration).
+  await sql`ALTER TABLE site_settings DROP COLUMN IF EXISTS search_indexing_enabled`;
+  console.log("SEO columns ready.");
+}
+
+// Carries forward the old per-page About/Contact noindex flags (which used
+// to live on site_settings) into the new dedicated about_page/contact_page
+// tables, then drops the old columns. Deliberately runs via UPDATE, AFTER
+// seedAboutPage()/seedContactPage() have already inserted the full page
+// content (see main() below) — inserting a bare {id, no_index} row here
+// first would make the seed functions' own COUNT(*) > 0 check think the
+// page was "already configured" and skip seeding the real copy, leaving
+// every other field blank.
+async function migrateAboutContactNoIndex() {
+  const hasOldAboutCol = await sql`
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = 'site_settings' AND column_name = 'about_no_index'
+  `;
+  if (!hasOldAboutCol.length) return;
+
+  console.log("Carrying forward old About/Contact noindex flags into about_page/contact_page...");
+  const [old] = await sql`SELECT about_no_index, contact_no_index FROM site_settings WHERE id = 1 LIMIT 1`;
+  if (old) {
+    await sql`UPDATE about_page SET no_index = ${!!old.about_no_index} WHERE id = 1`;
+    await sql`UPDATE contact_page SET no_index = ${!!old.contact_no_index} WHERE id = 1`;
+  }
+  await sql`ALTER TABLE site_settings DROP COLUMN IF EXISTS about_no_index`;
+  await sql`ALTER TABLE site_settings DROP COLUMN IF EXISTS contact_no_index`;
+  console.log("About/Contact noindex flags migrated.");
 }
 
 async function seedTours() {
@@ -371,8 +527,118 @@ async function seedSiteSettings() {
     console.log("site_settings: already configured — skipping seed.");
     return;
   }
-  await sql`INSERT INTO site_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING`;
-  console.log("site_settings: seeded (About/Contact/Blog indexing ON by default, same as every other page).");
+  const blogTitle = "Sagrada Familia Guides & Tips | Sagrada Familia Guided Tours";
+  const blogDescription =
+    "Practical guides for visiting Sagrada Familia — tower access, guided tour vs. audio guide, best time to visit, and more.";
+  await sql`
+    INSERT INTO site_settings (id, blog_meta_title, blog_meta_description)
+    VALUES (1, ${blogTitle}, ${blogDescription})
+    ON CONFLICT (id) DO NOTHING
+  `;
+  console.log("site_settings: seeded (Blog listing page SEO fields, indexing ON by default).");
+}
+
+// About/Contact used to be a single indexing toggle each on site_settings
+// — they're now full CMS-editable pages (lib/about.ts, lib/contact.ts).
+// This seeds the exact copy that used to be hardcoded directly in
+// app/about/page.tsx / app/contact/page.tsx, so nothing changes visually
+// on first migration — every field just becomes admin-editable.
+async function seedAboutPage() {
+  const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM about_page`;
+  if (count > 0) {
+    console.log("about_page: already configured — skipping seed.");
+    return;
+  }
+  const reasons = [
+    { icon: "ShieldCheckIcon", title: "Certified, Licensed Guides", body: "Every guided tour we list uses certified local guides — not fast-track entry resold as a \"tour.\"" },
+    { icon: "StarIcon", title: "Real Review Volume", body: "We only list tours with verifiable review counts and ratings, not cherry-picked testimonials." },
+    { icon: "LockIcon", title: "Transparent Pricing", body: "The price you see on the tour card is the price you pay — no hidden fees added at checkout." },
+    { icon: "HeadsetIcon", title: "Honest, Clear Info", body: "We tell you exactly what's included — and what isn't, like tower access, which is often separate." },
+  ];
+  const a = {
+    heroEyebrow: "About Us",
+    heroHeading: "Your Independent Guide to Sagrada Familia Tickets & Guided Tours",
+    heroSubheading:
+      "We help travelers book the right Sagrada Familia guided tour or skip-the-line ticket online — curated from certified, licensed operators, explained in plain language.",
+    heroImage: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=2000&auto=format&fit=crop",
+    heroImageAlt: "Sagrada Familia basilica facade in Barcelona",
+    introHeading: "Why We Built a Sagrada Familia Tour & Ticket Guide",
+    introParagraph1:
+      "We built this site around one belief: a guide is worth more than a bare entry ticket. Sagrada Familia has almost no on-site signage explaining what you're looking at — the symbolism in the façades, why the columns lean like trees, what each tower represents. A skip-the-line ticket gets you through the door. A good guided tour is the difference between seeing a beautiful building and actually understanding Gaudí's design.",
+    introParagraph2:
+      "We're an independent Sagrada Familia tickets and tours guide — not the official venue website. We compare guided tours, skip-the-line tickets, and tower-access options from licensed, established operators, currently via GetYourGuide, and point you to the ones worth your time and money.",
+    introImage: "https://images.unsplash.com/photo-1728249960363-13079cc2c6f6?q=80&w=1000&auto=format&fit=crop",
+    introImageAlt: "Sagrada Familia spires with apostle statues",
+    reasonsHeading: "How We Pick Our Sagrada Familia Guided Tours",
+    reasonsSubheading: "Every guided tour and ticket listed on this site is screened against four criteria before it earns a spot.",
+    disclosureHeading: "A Note on How We Earn",
+    disclosureBody:
+      "When you book a Sagrada Familia guided tour or ticket through a link on this site, we earn a small commission from the operator at no extra cost to you. This is how we keep the site free and independently written — it doesn't affect which tours we recommend or how we rank them.",
+    ctaText: "Ready to book your Sagrada Familia guided tour?",
+    ctaButtonLabel: "Compare Sagrada Familia Guided Tours",
+    metaTitle: "About Us | Sagrada Familia Guided Tour & Ticket Booking Guide",
+    metaDescription:
+      "Who curates our Sagrada Familia guided tours and skip-the-line tickets online, how we pick certified guides, and why a guided tour beats a bare entry ticket.",
+  };
+  await sql`
+    INSERT INTO about_page (
+      id, hero_eyebrow, hero_heading, hero_subheading, hero_image, hero_image_alt,
+      intro_heading, intro_paragraph_1, intro_paragraph_2, intro_image, intro_image_alt,
+      reasons_heading, reasons_subheading, reasons,
+      disclosure_heading, disclosure_body, cta_text, cta_button_label,
+      meta_title, meta_description
+    ) VALUES (
+      1, ${a.heroEyebrow}, ${a.heroHeading}, ${a.heroSubheading}, ${a.heroImage}, ${a.heroImageAlt},
+      ${a.introHeading}, ${a.introParagraph1}, ${a.introParagraph2}, ${a.introImage}, ${a.introImageAlt},
+      ${a.reasonsHeading}, ${a.reasonsSubheading}, ${JSON.stringify(reasons)}::jsonb,
+      ${a.disclosureHeading}, ${a.disclosureBody}, ${a.ctaText}, ${a.ctaButtonLabel},
+      ${a.metaTitle}, ${a.metaDescription}
+    )
+    ON CONFLICT (id) DO NOTHING
+  `;
+  console.log("about_page: seeded with the existing About page copy.");
+}
+
+async function seedContactPage() {
+  const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM contact_page`;
+  if (count > 0) {
+    console.log("contact_page: already configured — skipping seed.");
+    return;
+  }
+  const reasons = [
+    { icon: "HeadsetIcon", title: "Booking Help", body: "Not sure whether to book the guided tour, tower access, or the skip-the-line ticket? Ask before you book." },
+    { icon: "BriefcaseIcon", title: "Partnerships & Affiliates", body: "Tour operators, DMCs, and affiliate partners — reach out about listing or collaboration opportunities." },
+    { icon: "MailIcon", title: "General Questions", body: "Site feedback, content corrections, or anything else about Sagrada Familia guided tours." },
+  ];
+  const c = {
+    heroEyebrow: "Contact",
+    heroHeading: "Get in Touch",
+    heroSubheading:
+      "Questions about a Sagrada Familia guided tour or ticket — or a partnership inquiry? Reach out directly by email.",
+    email: "livetravelpartner@gmail.com",
+    emailNote: "We typically reply within 1–2 business days.",
+    reasonsHeading: "What we can help with",
+    footerNote:
+      "Already have a booking? Contact the tour operator directly via your confirmation email — they handle changes and refunds faster than we can.",
+    ctaHeading: "Not booked yet?",
+    ctaButtonLabel: "Compare Sagrada Familia Tours & Skip-the-Line Tickets",
+    metaTitle: "Contact Us | Sagrada Familia Guided Tours",
+    metaDescription:
+      "Questions about booking a Sagrada Familia guided tour, tower access, or tickets online? Reach out directly — including for partnership and affiliate inquiries.",
+  };
+  await sql`
+    INSERT INTO contact_page (
+      id, hero_eyebrow, hero_heading, hero_subheading, email, email_note,
+      reasons_heading, reasons, footer_note, cta_heading, cta_button_label,
+      meta_title, meta_description
+    ) VALUES (
+      1, ${c.heroEyebrow}, ${c.heroHeading}, ${c.heroSubheading}, ${c.email}, ${c.emailNote},
+      ${c.reasonsHeading}, ${JSON.stringify(reasons)}::jsonb, ${c.footerNote}, ${c.ctaHeading}, ${c.ctaButtonLabel},
+      ${c.metaTitle}, ${c.metaDescription}
+    )
+    ON CONFLICT (id) DO NOTHING
+  `;
+  console.log("contact_page: seeded with the existing Contact page copy.");
 }
 
 // Users are NOT seeded from data/users.json on purpose — that file may
@@ -383,6 +649,7 @@ async function seedSiteSettings() {
 async function main() {
   await createTables();
   await addNoIndexColumns();
+  await addSeoColumns();
   await seedTours();
   await seedComboOffers();
   await seedPosts();
@@ -390,6 +657,9 @@ async function main() {
   await seedFaqs();
   await seedPrivacyPolicy();
   await seedSiteSettings();
+  await seedAboutPage();
+  await seedContactPage();
+  await migrateAboutContactNoIndex();
   console.log("\nDone. Your database is ready.");
 }
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploadField from "./ImageUploadField";
-import IndexingToggle from "./IndexingToggle";
+import SeoFieldsCard from "./SeoFieldsCard";
 import type { Post, ContentBlock, ContentBlockType } from "@/lib/posts";
 import type { Tour } from "@/lib/data";
 
@@ -354,8 +354,21 @@ export default function PostForm({
 
       {/* Local state only, like every other field on this form —
           persisted together with everything else when "Publish
-          Post"/"Save Changes" is clicked below. */}
-      <IndexingToggle checked={post.noIndex} onChange={(next) => update("noIndex", next)} />
+          Post"/"Save Changes" is clicked below. SEO title/description
+          already live in the "Search & Preview" card above — this only
+          covers canonical/indexing/follow/social preview. */}
+      <SeoFieldsCard
+        pathHint={`/blog/${post.slug || "…"}`}
+        value={{
+          canonicalUrl: post.canonicalUrl,
+          noIndex: post.noIndex,
+          noFollow: post.noFollow,
+          ogTitle: post.ogTitle,
+          ogDescription: post.ogDescription,
+          ogImage: post.ogImage,
+        }}
+        onChange={(patch) => setPost((p) => ({ ...p, ...patch }))}
+      />
 
       <div className="flex gap-3">
         <button

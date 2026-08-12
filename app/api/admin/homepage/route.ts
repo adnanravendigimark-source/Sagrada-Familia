@@ -38,6 +38,11 @@ export async function PUT(req: Request) {
       ratingValue: body.ratingValue,
       ratingCount: body.ratingCount,
       noIndex: body.noIndex,
+      noFollow: !!body.noFollow,
+      canonicalUrl: body.canonicalUrl || "",
+      ogTitle: body.ogTitle || "",
+      ogDescription: body.ogDescription || "",
+      ogImage: body.ogImage || "",
     });
     return NextResponse.json({ ok: true });
   } catch (err) {

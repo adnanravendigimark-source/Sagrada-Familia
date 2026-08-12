@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploadField from "./ImageUploadField";
-import IndexingToggle from "./IndexingToggle";
+import SeoFieldsCard from "./SeoFieldsCard";
 import type { HomepageContent } from "@/lib/homepage";
 
 const inputClass =
@@ -98,8 +98,22 @@ export default function HomepageForm({ initial }: { initial: HomepageContent }) 
 
       {/* Local state only, like every other field on this form — persisted
           together with everything else when "Save Changes" is clicked
-          below. See IndexingToggle for what ON/OFF actually mean. */}
-      <IndexingToggle checked={content.noIndex} onChange={(next) => update("noIndex", next)} />
+          below. See lib/seo.ts for what each of these actually controls. */}
+      <SeoFieldsCard
+        pathHint="/"
+        value={{
+          canonicalUrl: content.canonicalUrl,
+          noIndex: content.noIndex,
+          noFollow: content.noFollow,
+          ogTitle: content.ogTitle,
+          ogDescription: content.ogDescription,
+          ogImage: content.ogImage,
+        }}
+        onChange={(patch) => {
+          setContent((c) => ({ ...c, ...patch }));
+          setSaved(false);
+        }}
+      />
 
       <div className="border-t border-stone-200 pt-5">
         <button

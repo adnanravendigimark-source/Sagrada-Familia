@@ -19,6 +19,15 @@ export interface HomepageContent {
   // Search Engine Indexing toggle (admin-editable). false (default) =
   // indexable (index, follow). true = noindex, nofollow. See lib/seo.ts.
   noIndex: boolean;
+  // Independent "Link Following" toggle — see lib/seo.ts's resolveRobots.
+  noFollow: boolean;
+  // Blank = auto-generate from SITE_URL + "/" (see lib/seo.ts resolveCanonical).
+  canonicalUrl: string;
+  // Open Graph / Twitter overrides — blank falls back to the page's own
+  // title/description/hero image (see lib/seo.ts resolveOg).
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
 }
 
 // Used only if the `homepage` table is empty or unreachable (e.g. before
@@ -39,6 +48,11 @@ const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   featuredUrgencyText: "",
   featuredReasons: [],
   noIndex: false,
+  noFollow: false,
+  canonicalUrl: "",
+  ogTitle: "",
+  ogDescription: "",
+  ogImage: "",
 };
 
 function parseReasons(value: unknown): string[] {
@@ -69,6 +83,11 @@ function rowToHomepage(row: any): HomepageContent {
     featuredUrgencyText: row.featured_urgency_text || "",
     featuredReasons: parseReasons(row.featured_reasons),
     noIndex: !!row.no_index,
+    noFollow: !!row.no_follow,
+    canonicalUrl: row.canonical_url || "",
+    ogTitle: row.og_title || "",
+    ogDescription: row.og_description || "",
+    ogImage: row.og_image || "",
   };
 }
 
@@ -104,14 +123,21 @@ export async function saveHomepageCopy(data: {
   ratingValue: string;
   ratingCount: string;
   noIndex: boolean;
+  noFollow: boolean;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
 }): Promise<void> {
   await sql`
     INSERT INTO homepage (
       id, hero_badge, hero_heading, hero_subheading, hero_image, hero_image_alt,
-      rating_value, rating_count, no_index
+      rating_value, rating_count, no_index, no_follow, canonical_url,
+      og_title, og_description, og_image
     ) VALUES (
       1, ${data.heroBadge}, ${data.heroHeading}, ${data.heroSubheading}, ${data.heroImage},
-      ${data.heroImageAlt}, ${data.ratingValue}, ${data.ratingCount}, ${!!data.noIndex}
+      ${data.heroImageAlt}, ${data.ratingValue}, ${data.ratingCount}, ${!!data.noIndex}, ${!!data.noFollow},
+      ${data.canonicalUrl || ""}, ${data.ogTitle || ""}, ${data.ogDescription || ""}, ${data.ogImage || ""}
     )
     ON CONFLICT (id) DO UPDATE SET
       hero_badge = EXCLUDED.hero_badge,
@@ -121,7 +147,12 @@ export async function saveHomepageCopy(data: {
       hero_image_alt = EXCLUDED.hero_image_alt,
       rating_value = EXCLUDED.rating_value,
       rating_count = EXCLUDED.rating_count,
-      no_index = EXCLUDED.no_index
+      no_index = EXCLUDED.no_index,
+      no_follow = EXCLUDED.no_follow,
+      canonical_url = EXCLUDED.canonical_url,
+      og_title = EXCLUDED.og_title,
+      og_description = EXCLUDED.og_description,
+      og_image = EXCLUDED.og_image
   `;
 }
 
