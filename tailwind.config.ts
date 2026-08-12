@@ -14,14 +14,22 @@ const config: Config = {
           900: "#241f1a",
         },
         gold: {
-          400: "#d9a441",
+          400: "rgb(var(--color-gold-400) / <alpha-value>)",
           500: "#c1892c",
           600: "#a3701f",
         },
+        // basilica.* and gold.400 are backed by CSS variables (defaults in
+        // globals.css :root) instead of fixed hex, so the admin-editable
+        // "Brand Colors" panel (/admin/homepage → Advanced SEO tab) can
+        // override them site-wide at runtime — see app/layout.tsx, which
+        // injects the admin's chosen values as an inline <style> tag. The
+        // `rgb(var(...) / <alpha-value>)` form is Tailwind's documented
+        // pattern for CSS-variable colors that still support opacity
+        // modifiers like `bg-basilica-terracotta/40`, used throughout.
         basilica: {
-          teal: "#0f5c5c",
-          terracotta: "#c4552f",
-          plum: "#4a2545",
+          teal: "rgb(var(--color-basilica-teal) / <alpha-value>)",
+          terracotta: "rgb(var(--color-basilica-terracotta) / <alpha-value>)",
+          plum: "rgb(var(--color-basilica-plum) / <alpha-value>)",
         },
         // Dark navy used for the wordmark in the premium logo lockup.
         navy: {

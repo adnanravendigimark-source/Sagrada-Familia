@@ -1,17 +1,21 @@
 import { getTours } from "@/lib/data";
+import { getHomepageContent } from "@/lib/homepage";
 
 // Built directly from the tours sold above — every row is a real,
 // bookable product with its own "Book" link, so this table works as a
-// second conversion surface rather than just reference info.
+// second conversion surface rather than just reference info. Heading/
+// subheading/note are editable from /admin/homepage → Content tab (see
+// lib/homepage.ts's PriceSection / DEFAULT_SECTIONS.price).
 export default async function PriceComparison() {
-  const tours = await getTours();
+  const [tours, { sections }] = await Promise.all([getTours(), getHomepageContent()]);
+  const s = sections.price;
   return (
     <section id="prices" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h2 className="font-display text-3xl font-bold text-stone-900">Compare & Choose Your Tours & Ticket</h2>
-      <p className="mt-3 max-w-2xl text-stone-900/70">
-        All three options side by side — pick the one that fits your trip, then book straight from
-        the table.
-      </p>
+      <h2 className="font-display text-3xl font-bold text-stone-900">{s.heading}</h2>
+      <p
+        className="rich-content mt-3 max-w-2xl text-stone-900/70"
+        dangerouslySetInnerHTML={{ __html: s.subheading }}
+      />
 
       <div className="mt-8 overflow-x-auto rounded-2xl border border-stone-900/10">
         <table className="w-full min-w-[680px] border-collapse bg-white text-left text-sm">
@@ -59,10 +63,7 @@ export default async function PriceComparison() {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-stone-900/50">
-        Children under 11 typically enter free; students, seniors, and youth-card holders get
-        reduced rates — check each ticket's booking page for exact tiers.
-      </p>
+      <p className="mt-3 text-xs text-stone-900/50">{s.note}</p>
     </section>
   );
 }

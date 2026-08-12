@@ -2,41 +2,13 @@ import Image from "next/image";
 import SafeImage from "./SafeImage";
 import { getHomepageContent } from "@/lib/homepage";
 
-// Real, free-to-use photography from Unsplash (Unsplash License — free for
-// commercial use). Swap for your own/licensed shots whenever you have them;
-// until then these are legitimate, not placeholders.
-//   Interior: photo by William Rudolph — unsplash.com/@william_rudolph
-//   Facade:   photo by Ahmed Salem — unsplash.com/@mozarty
-//   Towers:   photo by Pourya Gohari — unsplash.com/@_pourya_
-//   Skyline1: photo by Davit Margaryan — unsplash.com/@davitmarg
-//   Skyline2: photo by Salma Abdelnaby — unsplash.com/@salma_abdelnaby
-// The hero headline/subhead/badge/rating/photo are content-writer editable
-// from /admin/homepage — this file just renders whatever's in there.
-const galleryImages = [
-  {
-    src: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=900&auto=format&fit=crop",
-    alt: "Sagrada Familia basilica facade against the sky in Barcelona",
-    label: "The Basilica",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1728249960363-13079cc2c6f6?q=80&w=900&auto=format&fit=crop",
-    alt: "Sagrada Familia spires with apostle statues",
-    label: "The Towers",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1764107183244-0cef642a99a9?q=80&w=900&auto=format&fit=crop",
-    alt: "Barcelona skyline with the Sagrada Familia rising above the city",
-    label: "Barcelona Skyline",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1758471206484-0eaa2568320c?q=80&w=900&auto=format&fit=crop",
-    alt: "Barcelona cityscape with the Sagrada Familia at sunset",
-    label: "Sunset Views",
-  },
-];
-
+// The hero headline/subhead/badge/rating/photo/gallery/buttons are all
+// content-writer editable from /admin/homepage — this file just renders
+// whatever's in there (with sensible defaults so it never looks
+// broken/blank — see DEFAULT_GALLERY etc. in lib/homepage.ts).
 export default async function Hero() {
   const content = await getHomepageContent();
+  const gallery = content.heroGallery;
   return (
     <section id="top" className="relative overflow-hidden bg-basilica-plum text-white">
       {/* Full-bleed photo background */}
@@ -68,17 +40,17 @@ export default async function Hero() {
 
         <div className="mt-8 flex flex-wrap items-center gap-4 [@media(max-height:900px)]:mt-4">
           <a
-            href="#tours"
+            href={content.heroCtaPrimaryHref}
             className="group inline-flex items-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-basilica-terracotta/90"
           >
-            Compare Guided Tours
+            {content.heroCtaPrimaryText}
             <span className="transition group-hover:translate-x-0.5">→</span>
           </a>
           <a
-            href="#prices"
+            href={content.heroCtaSecondaryHref}
             className="rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
           >
-            See Tour Prices
+            {content.heroCtaSecondaryText}
           </a>
 
           {/* Floating glass rating card */}
@@ -91,11 +63,11 @@ export default async function Hero() {
           </div>
         </div>
 
-        {/* Real photo strip — facade, towers, skyline, sunset */}
+        {/* Photo strip — editable from Homepage → Images tab */}
         <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4 [@media(max-height:900px)]:mt-6">
-          {galleryImages.map((img) => (
+          {gallery.map((img, i) => (
             <div
-              key={img.label}
+              key={img.label + i}
               className="group relative aspect-square overflow-hidden rounded-2xl border border-white/15 shadow-lg shadow-black/20"
             >
               <Image

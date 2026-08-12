@@ -16,22 +16,30 @@ export default function Logo({
   className = "",
   variant = "compact",
   theme = "light",
+  src = "",
+  alt = "La Sagrada Familia Guided Tours",
 }: {
   className?: string;
   variant?: "compact" | "stacked";
   theme?: "light" | "dark";
+  // Admin-uploaded logo override (Homepage → Images tab). Blank (the
+  // default) keeps using the bundled Logo.png asset below, unchanged.
+  src?: string;
+  alt?: string;
 }) {
   const isDark = theme === "dark";
+  const customSrc = src.trim();
 
   if (variant === "stacked") {
     return (
       <Link href="/" className={`inline-flex items-center ${className}`}>
-        <Image
-          src={logo}
-          alt="La Sagrada Familia Guided Tours"
-          priority
-          className="h-32 w-auto sm:h-40"
-        />
+        {customSrc ? (
+          <span className="relative block h-32 w-52 sm:h-40 sm:w-64">
+            <Image src={customSrc} alt={alt} fill sizes="260px" className="object-contain object-left" priority />
+          </span>
+        ) : (
+          <Image src={logo} alt={alt} priority className="h-32 w-auto sm:h-40" />
+        )}
       </Link>
     );
   }
@@ -39,12 +47,12 @@ export default function Logo({
   const image = (
     <span className="relative block h-11 w-[5.75rem] overflow-hidden sm:h-12 sm:w-[6.25rem]">
       <Image
-        src={logo}
-        alt="La Sagrada Familia Guided Tours"
+        src={customSrc || logo}
+        alt={alt}
         fill
         priority
         sizes="150px"
-        // className="object-cover object-top"
+        className={customSrc ? "object-contain" : undefined}
       />
     </span>
   );

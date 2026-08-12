@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
-import { getHomepageContent, saveHomepageCopy, type HomepageContent } from "@/lib/homepage";
+import { revalidatePath } from "next/cache";
+import {
+  getHomepageContent,
+  saveHomepageCopy,
+  saveHomepageSections,
+  saveSiteHeader,
+  saveSiteFooter,
+  saveSiteTheme,
+  type HomepageContent,
+} from "@/lib/homepage";
 import { dbErrorMessage } from "@/lib/db";
 
 // Force this route to always run as a live serverless function rather than
@@ -13,11 +22,13 @@ export async function GET() {
   return NextResponse.json(await getHomepageContent());
 }
 
-// Only saves the Homepage page's own fields (hero copy, rating, SEO
-// toggle) — the Recommended Tour widget's fields are saved separately by
-// PUT /api/admin/recommended, and are deliberately left untouched here even
-// though the client still posts the full HomepageContent shape (harmless —
-// see saveHomepageCopy's comment for why this split exists).
+// Saves everything the Homepage admin tabs own: hero copy/gallery/CTA
+// buttons, the four content sections (Why/Tower/Practical/Price), the
+// site-wide header/footer, and brand colors. Deliberately does NOT touch
+// featured_tour_* (owned by PUT /api/admin/recommended) or no_index/
+// no_follow (owned by PUT /api/admin/indexing) even though the client
+// still posts the full HomepageContent shape — see each save function in
+// lib/homepage.ts for why that split exists.
 export async function PUT(req: Request) {
   // Whole handler wrapped in one try/catch — not just the DB call — so a
   // malformed body or any unexpected error still comes back as a real JSON
@@ -29,21 +40,44 @@ export async function PUT(req: Request) {
     if (!body) {
       return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
     }
-    await saveHomepageCopy({
-      heroBadge: body.heroBadge,
-      heroHeading: body.heroHeading,
-      heroSubheading: body.heroSubheading,
-      heroImage: body.heroImage,
-      heroImageAlt: body.heroImageAlt,
-      ratingValue: body.ratingValue,
-      ratingCount: body.ratingCount,
-      noIndex: body.noIndex,
-      noFollow: !!body.noFollow,
-      canonicalUrl: body.canonicalUrl || "",
-      ogTitle: body.ogTitle || "",
-      ogDescription: body.ogDescription || "",
-      ogImage: body.ogImage || "",
-    });
+
+    await Promise.all([
+      saveHomepageCopy({
+        heroBadge: body.heroBadge,
+        heroHeading: body.heroHeading,
+        heroSubheading: body.heroSubheading,
+        heroImage: body.heroImage,
+        heroImageAlt: body.heroImageAlt,
+        heroGallery: body.heroGallery || [],
+        heroCtaPrimaryText: body.heroCtaPrimaryText || "",
+        heroCtaPrimaryHref: body.heroCtaPrimaryHref || "",
+        heroCtaSecondaryText: body.heroCtaSecondaryText || "",
+        heroCtaSecondaryHref: body.heroCtaSecondaryHref || "",
+        ratingValue: body.ratingValue,
+        ratingCount: body.ratingCount,
+        metaTitle: body.metaTitle || "",
+        metaDescription: body.metaDescription || "",
+        focusKeyword: body.focusKeyword || "",
+        canonicalUrl: body.canonicalUrl || "",
+        ogTitle: body.ogTitle || "",
+        ogDescription: body.ogDescription || "",
+        ogImage: body.ogImage || "",
+      }),
+      saveHomepageSections(body.sections),
+      saveSiteHeader(body.header),
+      saveSiteFooter(body.footer),
+      saveSiteTheme(body.theme),
+    ]);
+
+    // Belt-and-suspenders on top of the existing force-dynamic + no-store
+    // setup (middleware.ts) — explicitly clears Next's Full Route Cache
+    // for the whole app (header/footer/theme render on every page, not
+    // just "/") so edits show up on the very next request, no hard
+    // refresh needed even in edge cases the no-store header doesn't cover
+    // (e.g. a CDN or proxy in front of Vercel that still respects
+    // stale-while-revalidate hints).
+    revalidatePath("/", "layout");
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json({ error: dbErrorMessage(err) }, { status: 500 });
