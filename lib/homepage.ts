@@ -156,6 +156,20 @@ export async function saveHomepageCopy(data: {
   `;
 }
 
+// Touches ONLY the indexing columns — used by the centralized "Indexing"
+// admin tab (/admin/indexing) so flipping this page's Index/Follow toggle
+// there can never clobber the Homepage form's hero copy or vice versa,
+// no matter which was saved most recently.
+export async function setHomepageIndexing(noIndex: boolean, noFollow: boolean): Promise<void> {
+  await sql`
+    INSERT INTO homepage (id, no_index, no_follow)
+    VALUES (1, ${!!noIndex}, ${!!noFollow})
+    ON CONFLICT (id) DO UPDATE SET
+      no_index = EXCLUDED.no_index,
+      no_follow = EXCLUDED.no_follow
+  `;
+}
+
 // Mirror image of saveHomepageCopy above — only touches the Recommended
 // Tour widget's own columns, leaving the Homepage page's hero copy alone.
 export async function saveRecommendedTour(data: {
