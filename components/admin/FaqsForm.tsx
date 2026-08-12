@@ -38,9 +38,10 @@ export default function FaqsForm({ initial }: { initial: FAQ[] }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(faqs.filter((f) => f.question.trim() && f.answer.trim())),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
     if (!res.ok) {
-      setError("Save failed. Please try again.");
+      setError(data.error || "Save failed. Please try again.");
       return;
     }
     setSaved(true);

@@ -10,17 +10,20 @@ export async function GET(_req: Request, { params }: { params: { slug: string } 
 }
 
 export async function PUT(req: Request, { params }: { params: { slug: string } }) {
-  const body = (await req.json()) as Post;
-  const posts = await getPosts();
-  const idx = posts.findIndex((p) => p.slug === params.slug);
-  if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  posts[idx] = { ...body, slug: params.slug, content: body.content || [] };
   try {
+    const body = (await req.json().catch(() => null)) as Post | null;
+    if (!body) {
+      return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    }
+    const posts = await getPosts();
+    const idx = posts.findIndex((p) => p.slug === params.slug);
+    if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    posts[idx] = { ...body, slug: params.slug, content: body.content || [] };
     await savePosts(posts);
+    return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json({ error: dbErrorMessage(err) }, { status: 500 });
   }
-  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(_req: Request, { params }: { params: { slug: string } }) {

@@ -81,17 +81,37 @@ export async function getHomepageContent(): Promise<HomepageContent> {
   }
 }
 
-export async function saveHomepageContent(data: HomepageContent): Promise<void> {
+// The Homepage admin page (/admin/homepage) and the Recommended Tour admin
+// page (/admin/recommended) both edit different fields of this same single
+// `homepage` row, but each is a separate form with its own page-load-time
+// snapshot of the full HomepageContent object. If either form saved by
+// PUTting its entire snapshot back (as a single saveHomepageContent(data)
+// used to), then saving one page after the other had been edited would
+// silently overwrite the other page's change with whatever stale value
+// happened to be sitting in the first form's state — e.g. editing the hero
+// headline and clicking Save would quietly revert any Recommended Tour
+// change made since the Homepage page was last loaded, and vice versa.
+// Splitting into two column-scoped saves (below) makes each form only ever
+// touch the columns it actually owns, so the two pages can no longer clobber
+// each other no matter what order they're saved in or how stale either
+// form's snapshot of the *other* page's fields is.
+export async function saveHomepageCopy(data: {
+  heroBadge: string;
+  heroHeading: string;
+  heroSubheading: string;
+  heroImage: string;
+  heroImageAlt: string;
+  ratingValue: string;
+  ratingCount: string;
+  noIndex: boolean;
+}): Promise<void> {
   await sql`
     INSERT INTO homepage (
       id, hero_badge, hero_heading, hero_subheading, hero_image, hero_image_alt,
-      rating_value, rating_count, show_featured_tour, featured_tour_id,
-      featured_badge_label, featured_urgency_text, featured_reasons, no_index
+      rating_value, rating_count, no_index
     ) VALUES (
       1, ${data.heroBadge}, ${data.heroHeading}, ${data.heroSubheading}, ${data.heroImage},
-      ${data.heroImageAlt}, ${data.ratingValue}, ${data.ratingCount}, ${!!data.showFeaturedTour},
-      ${data.featuredTourId}, ${data.featuredBadgeLabel}, ${data.featuredUrgencyText},
-      ${JSON.stringify(data.featuredReasons || [])}::jsonb, ${!!data.noIndex}
+      ${data.heroImageAlt}, ${data.ratingValue}, ${data.ratingCount}, ${!!data.noIndex}
     )
     ON CONFLICT (id) DO UPDATE SET
       hero_badge = EXCLUDED.hero_badge,
@@ -101,11 +121,32 @@ export async function saveHomepageContent(data: HomepageContent): Promise<void> 
       hero_image_alt = EXCLUDED.hero_image_alt,
       rating_value = EXCLUDED.rating_value,
       rating_count = EXCLUDED.rating_count,
+      no_index = EXCLUDED.no_index
+  `;
+}
+
+// Mirror image of saveHomepageCopy above — only touches the Recommended
+// Tour widget's own columns, leaving the Homepage page's hero copy alone.
+export async function saveRecommendedTour(data: {
+  showFeaturedTour: boolean;
+  featuredTourId: string;
+  featuredBadgeLabel: string;
+  featuredUrgencyText: string;
+  featuredReasons: string[];
+}): Promise<void> {
+  await sql`
+    INSERT INTO homepage (
+      id, show_featured_tour, featured_tour_id, featured_badge_label,
+      featured_urgency_text, featured_reasons
+    ) VALUES (
+      1, ${!!data.showFeaturedTour}, ${data.featuredTourId}, ${data.featuredBadgeLabel},
+      ${data.featuredUrgencyText}, ${JSON.stringify(data.featuredReasons || [])}::jsonb
+    )
+    ON CONFLICT (id) DO UPDATE SET
       show_featured_tour = EXCLUDED.show_featured_tour,
       featured_tour_id = EXCLUDED.featured_tour_id,
       featured_badge_label = EXCLUDED.featured_badge_label,
       featured_urgency_text = EXCLUDED.featured_urgency_text,
-      featured_reasons = EXCLUDED.featured_reasons,
-      no_index = EXCLUDED.no_index
+      featured_reasons = EXCLUDED.featured_reasons
   `;
 }
