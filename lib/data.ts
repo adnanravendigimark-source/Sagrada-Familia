@@ -10,7 +10,18 @@ import { sql } from "./db";
 export const PARTNER_ID = process.env.GYG_PARTNER_ID || "YOUR_PARTNER_ID";
 
 function gygLink(path: string, extra = "") {
-  return `https://www.getyourguide.com/${path}?partner_id=${PARTNER_ID}&utm_medium=online_publisher&cmp=sagrada${extra}`;
+  const trimmed = (path || "").trim();
+  // The admin can paste either just the path segment (the original,
+  // documented way — "barcelona-l45/tour-name-t12345") OR a complete URL
+  // copied straight from GetYourGuide/the partner dashboard. If it's
+  // already a full URL, use it exactly as given — don't prefix it with
+  // our own base URL. Prefixing unconditionally used to double up into a
+  // broken link whenever a full URL was pasted in:
+  // https://www.getyourguide.com/https://www.getyourguide.com/...
+  if (/^https?:\/\//i.test(trimmed)) {
+    return `${trimmed}${extra || ""}`;
+  }
+  return `https://www.getyourguide.com/${trimmed}?partner_id=${PARTNER_ID}&utm_medium=online_publisher&cmp=sagrada${extra}`;
 }
 
 export type TourType = "guided" | "self-guided" | "combo";
