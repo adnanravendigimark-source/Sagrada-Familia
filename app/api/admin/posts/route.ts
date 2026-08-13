@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     const today = new Date().toISOString().slice(0, 10);
-    posts.push({ ...body, content: body.content || [], updatedAt: today });
+    posts.push({ ...body, content: body.content || "", updatedAt: today });
     await savePosts(posts);
 
     // Belt-and-suspenders on top of the existing force-dynamic + no-store

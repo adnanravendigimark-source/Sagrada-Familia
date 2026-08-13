@@ -40,10 +40,16 @@ export interface Post {
   image: string;
   imageAlt: string;
   recommendedTourId: string;
-  // 1-indexed: the "Recommended Tour" widget renders right after this many
-  // content blocks. Leave unset/0 to not show it inline.
+  // Whether the "Recommended Tour" widget renders under the article body,
+  // right before the closing CTA. Stored as a number for backward
+  // compatibility with the old per-block placement (any value > 0 = show;
+  // 0/undefined = don't show) — the admin UI now only exposes a checkbox.
   recommendedTourAfterBlock?: number;
-  content: ContentBlock[];
+  // The full article body as one HTML string from RichTextEditor — bold,
+  // italic, headings, links, lists, tables, and inline images all live
+  // together in this single field, same as every other rich-text field in
+  // the admin (FAQ answers, tour descriptions, etc).
+  content: string;
   // The closing "Ready to book?" callout box — admin-editable per post,
   // falls back to the site's original hardcoded copy (via rowToPost) so
   // every post published before this existed keeps looking exactly the
@@ -68,17 +74,50 @@ export interface Post {
   ogImage: string;
 }
 
-function parseContent(value: unknown): ContentBlock[] {
-  if (Array.isArray(value)) return value as ContentBlock[];
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Converts a post that was written under the old "list of blocks" editor
+// into a single HTML string, so it opens and displays correctly in the new
+// one-page continuous editor without anyone having to re-type it. Runs
+// automatically on read — the DB row itself isn't touched until that post
+// is next saved, at which point it's written back out as a plain string.
+function blocksToHtml(blocks: ContentBlock[]): string {
+  return blocks
+    .map((block) => {
+      if (block.type === "heading") {
+        const level = block.level === 3 ? 3 : 2;
+        return `<h${level}>${escapeHtml(block.text || "")}</h${level}>`;
+      }
+      if (block.type === "list") {
+        const tag = block.ordered ? "ol" : "ul";
+        const items = (block.items || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+        return `<${tag}>${items}</${tag}>`;
+      }
+      if (block.type === "image") {
+        if (!block.src) return "";
+        const img = `<img src="${block.src}" alt="${escapeHtml(block.alt || "")}" />`;
+        return block.caption
+          ? `<figure>${img}<figcaption>${escapeHtml(block.caption)}</figcaption></figure>`
+          : `<figure>${img}</figure>`;
+      }
+      // paragraph blocks already store their own HTML from RichTextEditor.
+      return block.text || "";
+    })
+    .filter(Boolean)
+    .join("");
+}
+
+// A post's content column holds one of two shapes depending on when it was
+// last saved: an array of the old typed blocks (heading/paragraph/list/
+// image), or — for every post saved since the editor became one continuous
+// field — a plain HTML string. Both are normalized to a string here so the
+// rest of the app never has to think about the old format again.
+function parseContent(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return blocksToHtml(value as ContentBlock[]);
+  return "";
 }
 
 function rowToPost(row: any): Post {
@@ -174,7 +213,7 @@ export async function savePosts(posts: Post[]): Promise<void> {
         ${p.slug}, ${p.title}, ${p.metaTitle}, ${p.metaDescription}, ${p.category},
         ${p.excerpt}, ${p.quickAnswer}, ${p.readTime}, ${p.date}, ${p.updatedAt || p.date}, ${p.image}, ${p.imageAlt},
         ${p.recommendedTourId || ""}, ${p.recommendedTourAfterBlock ?? null},
-        ${JSON.stringify(p.content || [])}::jsonb, ${i},
+        ${JSON.stringify(p.content || "")}::jsonb, ${i},
         ${p.ctaHeading || ""}, ${p.ctaBody || ""}, ${p.ctaButtonText || ""}, ${p.ctaButtonHref || ""}, ${p.focusKeyword || ""},
         ${!!p.noIndex}, ${!!p.noFollow}, ${p.canonicalUrl || ""}, ${p.ogTitle || ""}, ${p.ogDescription || ""}, ${p.ogImage || ""}
       )
