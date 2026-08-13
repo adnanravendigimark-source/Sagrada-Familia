@@ -334,6 +334,27 @@ async function addBlogCmsColumns() {
   console.log("Blog-CMS columns ready.");
 }
 
+// Every image ever uploaded through the admin (hero images, tour photos,
+// inline article images, etc.) gets one row here — permanently. Nothing in
+// this codebase ever deletes a Blob or a row from this table: replacing a
+// field's image just points that field at a new URL, the old upload stays
+// live in Blob storage and listed here so it can be reused later. This is
+// what powers the "Media Library" tab in every image picker.
+async function addMediaLibraryTable() {
+  console.log("Ensuring media_library table exists...");
+  await sql`
+    CREATE TABLE IF NOT EXISTS media_library (
+      id SERIAL PRIMARY KEY,
+      url TEXT NOT NULL UNIQUE,
+      filename TEXT NOT NULL DEFAULT '',
+      content_type TEXT NOT NULL DEFAULT '',
+      size_bytes INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  console.log("media_library table ready.");
+}
+
 // Handles databases that already existed before the per-page "Search
 // Engine Indexing" toggle was added — CREATE TABLE IF NOT EXISTS above
 // only helps on a brand-new database, it won't retroactively add a column
@@ -710,6 +731,7 @@ async function main() {
   await addSeoColumns();
   await addHomepageCmsColumns();
   await addBlogCmsColumns();
+  await addMediaLibraryTable();
   await seedTours();
   await seedComboOffers();
   await seedPosts();
