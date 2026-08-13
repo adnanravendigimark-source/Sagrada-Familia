@@ -415,6 +415,11 @@ async function addSeoColumns() {
   await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_og_description TEXT NOT NULL DEFAULT ''`;
   await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS blog_og_image TEXT NOT NULL DEFAULT ''`;
 
+  // Nullable column that stores a bcrypt/scrypt hash of the owner account's
+  // password when the owner changes it through /admin/account. When NULL,
+  // the login route falls back to the plain-text ADMIN_PASSWORD env var.
+  await sql`ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS admin_password_hash TEXT`;
+
   // The old site-wide "hide the entire site from Google" master switch has
   // been replaced by per-page toggles on every page — drop its now-unused
   // column (a leftover from before that migration).
