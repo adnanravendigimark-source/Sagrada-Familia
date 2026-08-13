@@ -308,6 +308,32 @@ async function addHomepageCmsColumns() {
   console.log("Homepage-CMS columns ready.");
 }
 
+// Full CMS upgrade for the Blog Posts admin editor: a "last updated" date
+// (for Article schema's dateModified + the sitemap's lastModified), a
+// focus-keyword writing aid matching the homepage's, and the editable
+// "Ready to book?" closing CTA (each defaults to '' — the app layer in
+// lib/posts.ts's rowToPost falls back to the original hardcoded CTA copy
+// whenever these are empty, so running this never changes anything
+// visible until an admin actually edits it). Also adds the table that
+// backs "renaming a post's URL automatically redirects the old address".
+async function addBlogCmsColumns() {
+  console.log("Ensuring full blog-CMS columns exist on posts...");
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS focus_keyword TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS cta_heading TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS cta_body TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS cta_button_text TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS cta_button_href TEXT NOT NULL DEFAULT ''`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS post_redirects (
+      old_slug TEXT PRIMARY KEY,
+      new_slug TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  console.log("Blog-CMS columns ready.");
+}
+
 // Handles databases that already existed before the per-page "Search
 // Engine Indexing" toggle was added — CREATE TABLE IF NOT EXISTS above
 // only helps on a brand-new database, it won't retroactively add a column
@@ -683,6 +709,7 @@ async function main() {
   await addNoIndexColumns();
   await addSeoColumns();
   await addHomepageCmsColumns();
+  await addBlogCmsColumns();
   await seedTours();
   await seedComboOffers();
   await seedPosts();
