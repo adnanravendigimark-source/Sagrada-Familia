@@ -34,7 +34,6 @@ export default async function ContactPage() {
   return (
     <>
       <Header />
-      <Breadcrumbs items={[{ name: "Contact", path: "/contact" }]} />
       <main className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-basilica-teal">
