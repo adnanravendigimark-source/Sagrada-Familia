@@ -47,6 +47,11 @@ export interface TourRecord {
   hrefExtra?: string;
   featured?: boolean;
   bestFor: string;
+  // Shown in the homepage price-comparison table's second feature column
+  // (see components/PriceComparison.tsx and the Price section's
+  // column2Label in lib/homepage.ts) — e.g. "Passion or Nativity Tower".
+  // Blank renders as "No" in that column.
+  priceTableFeature?: string;
 }
 
 // The shape components actually render — same as TourRecord but with a
@@ -87,6 +92,7 @@ function rowToTour(row: any): TourRecord {
     hrefExtra: row.href_extra || undefined,
     featured: !!row.featured,
     bestFor: row.best_for,
+    priceTableFeature: row.price_table_feature || undefined,
   };
 }
 
@@ -112,12 +118,12 @@ export async function saveTours(records: TourRecord[]): Promise<void> {
       INSERT INTO tours (
         id, badge, ribbon, title, description, includes, duration, rating,
         reviews, price, original_price, image, image_alt, href_path,
-        href_extra, featured, best_for, sort_order
+        href_extra, featured, best_for, price_table_feature, sort_order
       ) VALUES (
         ${t.id}, ${t.badge}, ${t.ribbon || null}, ${t.title}, ${t.description},
         ${JSON.stringify(t.includes || [])}::jsonb, ${t.duration || null}, ${t.rating},
         ${t.reviews}, ${t.price}, ${t.originalPrice ?? null}, ${t.image}, ${t.imageAlt},
-        ${t.hrefPath}, ${t.hrefExtra || null}, ${!!t.featured}, ${t.bestFor}, ${i}
+        ${t.hrefPath}, ${t.hrefExtra || null}, ${!!t.featured}, ${t.bestFor}, ${t.priceTableFeature || ""}, ${i}
       )
       ON CONFLICT (id) DO UPDATE SET
         badge = EXCLUDED.badge,
@@ -136,6 +142,7 @@ export async function saveTours(records: TourRecord[]): Promise<void> {
         href_extra = EXCLUDED.href_extra,
         featured = EXCLUDED.featured,
         best_for = EXCLUDED.best_for,
+        price_table_feature = EXCLUDED.price_table_feature,
         sort_order = EXCLUDED.sort_order
     `;
   }

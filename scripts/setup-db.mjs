@@ -89,6 +89,7 @@ async function createTables() {
       href_extra TEXT,
       featured BOOLEAN NOT NULL DEFAULT false,
       best_for TEXT NOT NULL DEFAULT '',
+      price_table_feature TEXT NOT NULL DEFAULT '',
       sort_order INTEGER NOT NULL DEFAULT 0
     )
   `;
@@ -425,6 +426,11 @@ async function addSeoColumns() {
   // column (a leftover from before that migration).
   await sql`ALTER TABLE site_settings DROP COLUMN IF EXISTS search_indexing_enabled`;
   console.log("SEO columns ready.");
+
+  // Per-tour value shown in the homepage price-comparison table's second
+  // feature column (e.g. "Passion or Nativity Tower") — replaces what used
+  // to be a hardcoded tour-ID check in components/PriceComparison.tsx.
+  await sql`ALTER TABLE tours ADD COLUMN IF NOT EXISTS price_table_feature TEXT NOT NULL DEFAULT ''`;
 }
 
 // Carries forward the old per-page About/Contact noindex flags (which used

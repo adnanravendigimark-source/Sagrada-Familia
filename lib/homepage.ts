@@ -80,6 +80,15 @@ export interface PriceSection {
   heading: string;
   subheading: string;
   note: string;
+  // Column headers for the price-comparison table below — admin-editable
+  // so a differently-shaped product (e.g. a river cruise site with
+  // "Duration"/"Meal Included" instead of "Live Guide"/"Tower Access")
+  // never needs a code change to relabel its own table.
+  itemLabel: string;
+  priceLabel: string;
+  column1Label: string;
+  column2Label: string;
+  bestForLabel: string;
 }
 
 export interface HomepageSections {
@@ -335,6 +344,11 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     subheading:
       "All three options side by side — pick the one that fits your trip, then book straight from the table.",
     note: "Children under 11 typically enter free; students, seniors, and youth-card holders get reduced rates — check each ticket's booking page for exact tiers.",
+    itemLabel: "Ticket Type",
+    priceLabel: "Price",
+    column1Label: "Live Guide",
+    column2Label: "Tower Access",
+    bestForLabel: "Best For",
   },
 };
 

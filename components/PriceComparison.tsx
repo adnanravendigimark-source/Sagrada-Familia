@@ -21,11 +21,11 @@ export default async function PriceComparison() {
         <table className="w-full min-w-[680px] border-collapse bg-white text-left text-sm">
           <thead>
             <tr className="bg-stone-900 text-white">
-              <th className="px-5 py-4 font-semibold">Ticket Type</th>
-              <th className="px-5 py-4 font-semibold">Price</th>
-              <th className="px-5 py-4 font-semibold">Live Guide</th>
-              <th className="px-5 py-4 font-semibold">Tower Access</th>
-              <th className="px-5 py-4 font-semibold">Best For</th>
+              <th className="px-5 py-4 font-semibold">{s.itemLabel}</th>
+              <th className="px-5 py-4 font-semibold">{s.priceLabel}</th>
+              <th className="px-5 py-4 font-semibold">{s.column1Label}</th>
+              <th className="px-5 py-4 font-semibold">{s.column2Label}</th>
+              <th className="px-5 py-4 font-semibold">{s.bestForLabel}</th>
               <th className="px-5 py-4 font-semibold"></th>
             </tr>
           </thead>
@@ -44,9 +44,7 @@ export default async function PriceComparison() {
                 <td className="px-5 py-4 text-stone-900/70">
                   {tour.badge === "self-guided" ? "No" : "Yes — certified guide"}
                 </td>
-                <td className="px-5 py-4 text-stone-900/70">
-                  {tour.id === "guided-tour-tower-access" ? "Passion or Nativity Tower" : "No"}
-                </td>
+                <td className="px-5 py-4 text-stone-900/70">{tour.priceTableFeature || "No"}</td>
                 <td className="px-5 py-4 text-stone-900/70">{tour.bestFor}</td>
                 <td className="px-5 py-4 text-right">
                   <a
