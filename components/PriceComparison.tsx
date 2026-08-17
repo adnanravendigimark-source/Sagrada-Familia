@@ -42,7 +42,7 @@ export default async function PriceComparison() {
                   €{tour.price} <span className="font-normal text-stone-900/40">/ person</span>
                 </td>
                 <td className="px-5 py-4 text-stone-900/70">
-                  {tour.badge === "self-guided" ? "No" : "Yes — certified guide"}
+                  {tour.priceTableColumn1 || (tour.badge === "self-guided" ? "No" : "Yes — certified guide")}
                 </td>
                 <td className="px-5 py-4 text-stone-900/70">{tour.priceTableFeature || "No"}</td>
                 <td className="px-5 py-4 text-stone-900/70">{tour.bestFor}</td>
