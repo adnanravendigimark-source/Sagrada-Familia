@@ -20,12 +20,10 @@ export default async function TourGrid() {
     <section id="tours" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="max-w-2xl">
         <h2 className="font-display text-3xl font-bold text-stone-900">
-          Sagrada Familia Guided Tours & Tickets
+          {content.sections.tours.heading}
         </h2>
         <p className="mt-3 text-stone-900/70">
-          Three clear options — a guided tour, a guided tour with tower access, and a self-guided
-          entry ticket for a lower budget. A certified guide is the single biggest upgrade to a
-          Sagrada Familia visit.
+          {content.sections.tours.subheading}
         </p>
       </div>
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -33,6 +31,7 @@ export default async function TourGrid() {
           <TourCard
             key={tour.id}
             tour={tour}
+            bookNowText={content.header.bookNowText}
             recommended={
               content.showFeaturedTour && tour.id === content.featuredTourId
                 ? {

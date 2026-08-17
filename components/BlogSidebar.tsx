@@ -3,6 +3,7 @@ import SafeImage from "./SafeImage";
 import StarRating from "./StarRating";
 import { getTours } from "@/lib/data";
 import { getRelatedPosts } from "@/lib/posts";
+import { getHomepageContent } from "@/lib/homepage";
 
 export default async function BlogSidebar({
   slug,
@@ -11,9 +12,13 @@ export default async function BlogSidebar({
   slug: string;
   recommendedTourId: string;
 }) {
-  const tours = await getTours();
+  const [tours, related, { header, sections }] = await Promise.all([
+    getTours(),
+    getRelatedPosts(slug),
+    getHomepageContent(),
+  ]);
   const tour = tours.find((t) => t.id === recommendedTourId);
-  const related = await getRelatedPosts(slug);
+  const s = sections.blogPage;
 
   return (
     <aside className="space-y-8 lg:sticky lg:top-24 lg:self-start">
@@ -22,7 +27,7 @@ export default async function BlogSidebar({
           <div className="relative aspect-[4/3]">
             <SafeImage src={tour.image} alt={tour.imageAlt} fill sizes="320px" className="object-cover" />
             <span className="absolute left-3 top-3 rounded-full bg-gold-500 px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm">
-              Recommended
+              {s.sidebarRecommendedBadge}
             </span>
           </div>
           <div className="p-5">
@@ -43,7 +48,7 @@ export default async function BlogSidebar({
                 rel="noopener nofollow sponsored"
                 className="rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-basilica-terracotta/90"
               >
-                Book Now
+                {header.bookNowText}
               </a>
             </div>
           </div>
@@ -52,7 +57,7 @@ export default async function BlogSidebar({
 
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-stone-900/40">
-          Related Articles
+          {s.sidebarRelatedHeading}
         </p>
         <div className="mt-4 space-y-4">
           {related.map((post) => (
@@ -77,7 +82,7 @@ export default async function BlogSidebar({
         href="/#tours"
         className="block rounded-2xl bg-basilica-teal/5 p-5 text-center text-sm font-semibold text-stone-900 transition hover:bg-basilica-teal/10"
       >
-        Compare all tours &amp; tickets →
+        {s.sidebarCompareLinkText}
       </a>
     </aside>
   );

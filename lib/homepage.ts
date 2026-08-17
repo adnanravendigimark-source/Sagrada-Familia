@@ -31,6 +31,12 @@ export interface FooterColumn {
   links: FooterLink[];
 }
 
+// The heading + intro text directly above the tour grid.
+export interface TourSection {
+  heading: string;
+  subheading: string;
+}
+
 // "Why a Guided Tour" section (the timeline + what-you'll-learn section
 // right below the tour grid).
 export interface WhySection {
@@ -89,13 +95,66 @@ export interface PriceSection {
   column1Label: string;
   column2Label: string;
   bestForLabel: string;
+  // Per-row "Book" button label — kept separate from the site-wide
+  // bookNowText on HeaderContent since this table cell is narrower and
+  // originally shipped with its own shorter "Book" copy.
+  bookLabel: string;
+}
+
+// The heading above the FAQ accordion (the questions/answers themselves
+// are edited from /admin/faqs).
+export interface FaqSection {
+  heading: string;
+}
+
+// Custom 404 page copy.
+export interface NotFoundSection {
+  heading: string;
+  body: string;
+  primaryButtonText: string;
+  primaryButtonHref: string;
+  secondaryButtonText: string;
+  secondaryButtonHref: string;
+}
+
+// The "From the Blog" teaser band on the homepage, right above the FAQ.
+export interface BlogTeaserSection {
+  eyebrow: string;
+  heading: string;
+  subheading: string;
+  viewAllText: string;
+  readArticleText: string;
+}
+
+// Shared labels used across the blog listing page and every article page.
+export interface BlogPageSection {
+  eyebrow: string;
+  heading: string;
+  subheading: string;
+  emptyStateText: string;
+  featuredLinkText: string;
+  ctaHeading: string;
+  ctaButtonText: string;
+  backToGuidesText: string;
+  quickAnswerLabel: string;
+  tocLabel: string;
+  relatedGuidesHeading: string;
+  sidebarRelatedHeading: string;
+  sidebarRecommendedBadge: string;
+  sidebarCompareLinkText: string;
+  promoRecommendedText: string;
 }
 
 export interface HomepageSections {
+  tours: TourSection;
   why: WhySection;
   tower: TowerSection;
   practical: PracticalSection;
   price: PriceSection;
+  faq: FaqSection;
+  notFound: NotFoundSection;
+  blogTeaser: BlogTeaserSection;
+  blogPage: BlogPageSection;
 }
 
 // Site-wide navbar — edited from the Homepage admin tab for simplicity,
@@ -106,6 +165,15 @@ export interface HeaderContent {
   navLinks: NavLink[];
   ctaText: string;
   ctaHref: string;
+  // Two-line wordmark text shown next to the logo icon in the compact
+  // (navbar/footer) variant — see components/Logo.tsx.
+  logoLine1: string;
+  logoLine2: string;
+  // First breadcrumb crumb, shown on every page with a breadcrumb trail
+  // (see components/Breadcrumbs.tsx).
+  homeLabel: string;
+  // Used on every tour card, the mobile sticky bar, and the blog sidebar.
+  bookNowText: string;
 }
 
 // Site-wide footer — same "edited from Homepage, rendered everywhere" deal.
@@ -198,6 +266,10 @@ export const DEFAULT_HEADER: HeaderContent = {
   ],
   ctaText: "Book a Tour",
   ctaHref: "/#tours",
+  logoLine1: "La Sagrada Familia",
+  logoLine2: "Guided Tours",
+  homeLabel: "Home",
+  bookNowText: "Book Now",
 };
 
 export const DEFAULT_FOOTER: FooterContent = {
@@ -261,6 +333,11 @@ export const DEFAULT_GALLERY: GalleryImage[] = [
 ];
 
 export const DEFAULT_SECTIONS: HomepageSections = {
+  tours: {
+    heading: "Sagrada Familia Guided Tours & Tickets",
+    subheading:
+      "Three clear options — a guided tour, a guided tour with tower access, and a self-guided entry ticket for a lower budget. A certified guide is the single biggest upgrade to a Sagrada Familia visit.",
+  },
   why: {
     heading: "What You Actually Get on a Guided Tour",
     intro:
@@ -349,6 +426,43 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     column1Label: "Live Guide",
     column2Label: "Tower Access",
     bestForLabel: "Best For",
+    bookLabel: "Book",
+  },
+  faq: {
+    heading: "Sagrada Familia Guided Tour FAQs",
+  },
+  notFound: {
+    heading: "This page wandered off, like a tourist without a guide.",
+    body: "The page you're looking for doesn't exist or may have moved. Try one of these instead.",
+    primaryButtonText: "Compare Guided Tours & Tickets →",
+    primaryButtonHref: "/#tours",
+    secondaryButtonText: "Read the Travel Guide",
+    secondaryButtonHref: "/blog",
+  },
+  blogTeaser: {
+    eyebrow: "From the Blog",
+    heading: "Sagrada Familia Guides & Tips",
+    subheading:
+      "Expert advice, ticket comparisons, and insider tips to help you plan your visit and choose the best guided tour.",
+    viewAllText: "View All Articles",
+    readArticleText: "Read Article",
+  },
+  blogPage: {
+    eyebrow: "Guided Tour Blog",
+    heading: "Sagrada Familia Travel Guide",
+    subheading: "Practical guides to help you plan your visit and pick the right ticket.",
+    emptyStateText: "No articles published yet — check back soon.",
+    featuredLinkText: "Read the guide",
+    ctaHeading: "Ready to book your Sagrada Familia guided tour?",
+    ctaButtonText: "Compare Sagrada Familia Guided Tours & Tickets →",
+    backToGuidesText: "← All guides",
+    quickAnswerLabel: "Quick Answer",
+    tocLabel: "In This Guide",
+    relatedGuidesHeading: "Related Guides",
+    sidebarRelatedHeading: "Related Articles",
+    sidebarRecommendedBadge: "Recommended",
+    sidebarCompareLinkText: "Compare all tours & tickets →",
+    promoRecommendedText: "Recommended for you",
   },
 };
 
@@ -444,10 +558,15 @@ function rowToHomepage(row: any): HomepageContent {
     featuredUrgencyText: row.featured_urgency_text || "",
     featuredReasons: parseReasons(row.featured_reasons),
     sections: {
+      tours: { ...DEFAULT_SECTIONS.tours, ...sectionsRaw.tours },
       why: { ...DEFAULT_SECTIONS.why, ...sectionsRaw.why },
       tower: { ...DEFAULT_SECTIONS.tower, ...sectionsRaw.tower },
       practical: { ...DEFAULT_SECTIONS.practical, ...sectionsRaw.practical },
       price: { ...DEFAULT_SECTIONS.price, ...sectionsRaw.price },
+      faq: { ...DEFAULT_SECTIONS.faq, ...sectionsRaw.faq },
+      notFound: { ...DEFAULT_SECTIONS.notFound, ...sectionsRaw.notFound },
+      blogTeaser: { ...DEFAULT_SECTIONS.blogTeaser, ...sectionsRaw.blogTeaser },
+      blogPage: { ...DEFAULT_SECTIONS.blogPage, ...sectionsRaw.blogPage },
     },
     header: parseJsonWithDefault<HeaderContent>(row.header_json, DEFAULT_HEADER),
     footer: parseJsonWithDefault<FooterContent>(row.footer_json, DEFAULT_FOOTER),

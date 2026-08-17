@@ -12,6 +12,9 @@ export interface ContactPageContent {
   heroSubheading: string;
   email: string;
   emailNote: string;
+  // Small label shown above the email address itself — see
+  // app/contact/page.tsx.
+  emailLabel: string;
   reasonsHeading: string;
   reasons: ContactReason[];
   footerNote: string;
@@ -34,6 +37,7 @@ const DEFAULT_CONTACT: ContactPageContent = {
     "Questions about a Sagrada Familia guided tour or ticket — or a partnership inquiry? Reach out directly by email.",
   email: "livetravelpartner@gmail.com",
   emailNote: "We typically reply within 1–2 business days.",
+  emailLabel: "Email us directly",
   reasonsHeading: "What we can help with",
   reasons: [
     { icon: "HeadsetIcon", title: "Booking Help", body: "Not sure whether to book the guided tour, tower access, or the skip-the-line ticket? Ask before you book." },
@@ -75,6 +79,7 @@ function rowToContact(row: any): ContactPageContent {
     heroSubheading: row.hero_subheading ?? DEFAULT_CONTACT.heroSubheading,
     email: row.email || DEFAULT_CONTACT.email,
     emailNote: row.email_note ?? DEFAULT_CONTACT.emailNote,
+    emailLabel: row.email_label ?? DEFAULT_CONTACT.emailLabel,
     reasonsHeading: row.reasons_heading ?? DEFAULT_CONTACT.reasonsHeading,
     reasons: parseReasons(row.reasons).length ? parseReasons(row.reasons) : DEFAULT_CONTACT.reasons,
     footerNote: row.footer_note ?? DEFAULT_CONTACT.footerNote,
@@ -115,12 +120,12 @@ export async function setContactIndexing(noIndex: boolean, noFollow: boolean): P
 export async function saveContactPage(data: ContactPageContent): Promise<void> {
   await sql`
     INSERT INTO contact_page (
-      id, hero_eyebrow, hero_heading, hero_subheading, email, email_note,
+      id, hero_eyebrow, hero_heading, hero_subheading, email, email_note, email_label,
       reasons_heading, reasons, footer_note, cta_heading, cta_button_label,
       meta_title, meta_description, canonical_url, no_index, no_follow,
       og_title, og_description, og_image
     ) VALUES (
-      1, ${data.heroEyebrow}, ${data.heroHeading}, ${data.heroSubheading}, ${data.email}, ${data.emailNote},
+      1, ${data.heroEyebrow}, ${data.heroHeading}, ${data.heroSubheading}, ${data.email}, ${data.emailNote}, ${data.emailLabel || ""},
       ${data.reasonsHeading}, ${JSON.stringify(data.reasons || [])}::jsonb, ${data.footerNote}, ${data.ctaHeading}, ${data.ctaButtonLabel},
       ${data.metaTitle}, ${data.metaDescription}, ${data.canonicalUrl || ""}, ${!!data.noIndex}, ${!!data.noFollow},
       ${data.ogTitle || ""}, ${data.ogDescription || ""}, ${data.ogImage || ""}
@@ -131,6 +136,7 @@ export async function saveContactPage(data: ContactPageContent): Promise<void> {
       hero_subheading = EXCLUDED.hero_subheading,
       email = EXCLUDED.email,
       email_note = EXCLUDED.email_note,
+      email_label = EXCLUDED.email_label,
       reasons_heading = EXCLUDED.reasons_heading,
       reasons = EXCLUDED.reasons,
       footer_note = EXCLUDED.footer_note,

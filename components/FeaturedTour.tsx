@@ -38,7 +38,7 @@ export default async function FeaturedTour() {
           rel="noopener nofollow sponsored"
           className="shrink-0 rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-basilica-terracotta/90"
         >
-          Book Now
+          {content.header.bookNowText}
         </a>
       </div>
     </div>

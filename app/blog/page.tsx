@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import SafeImage from "@/components/SafeImage";
 import { getPosts } from "@/lib/posts";
 import { getBlogSeoSettings } from "@/lib/settings";
+import { getHomepageContent } from "@/lib/homepage";
 import { resolveRobots, resolveCanonical, resolveOg } from "@/lib/seo";
 
 // Posts now live in /data/posts.json, editable from /admin/posts — render
@@ -28,7 +29,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogIndexPage() {
-  const posts = await getPosts();
+  const [posts, { sections }] = await Promise.all([getPosts(), getHomepageContent()]);
+  const s = sections.blogPage;
   const [featured, ...rest] = posts;
 
   return (
@@ -37,19 +39,19 @@ export default async function BlogIndexPage() {
       <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-basilica-teal">
-            Guided Tour Blog
+            {s.eyebrow}
           </p>
           <h1 className="mt-3 font-display text-3xl font-bold text-stone-900 sm:text-4xl">
-            Sagrada Familia Travel Guide
+            {s.heading}
           </h1>
           <p className="mx-auto mt-3 max-w-md text-stone-900/60">
-            Practical guides to help you plan your visit and pick the right ticket.
+            {s.subheading}
           </p>
         </div>
 
         {!featured && (
           <p className="mt-14 rounded-3xl border border-dashed border-stone-300 p-10 text-center text-sm text-stone-500">
-            No articles published yet — check back soon.
+            {s.emptyStateText}
           </p>
         )}
 
@@ -77,7 +79,7 @@ export default async function BlogIndexPage() {
               </h2>
               <p className="mt-3 line-clamp-3 text-stone-900/70">{featured.excerpt}</p>
               <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-basilica-terracotta">
-                Read the guide <span className="transition group-hover:translate-x-0.5">→</span>
+                {s.featuredLinkText} <span className="transition group-hover:translate-x-0.5">→</span>
               </span>
             </div>
           </Link>
@@ -118,13 +120,13 @@ export default async function BlogIndexPage() {
 
         <div className="mt-16 flex flex-col items-center gap-4 rounded-3xl bg-basilica-teal/5 p-10 text-center">
           <p className="font-display text-xl font-semibold text-stone-900">
-            Ready to book your Sagrada Familia guided tour?
+            {s.ctaHeading}
           </p>
           <a
             href="/#tours"
             className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
           >
-            Compare Sagrada Familia Guided Tours &amp; Tickets →
+            {s.ctaButtonText}
           </a>
         </div>
       </main>

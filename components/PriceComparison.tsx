@@ -53,7 +53,7 @@ export default async function PriceComparison() {
                     rel="noopener nofollow sponsored"
                     className="inline-flex rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-basilica-terracotta/90"
                   >
-                    Book
+                    {s.bookLabel}
                   </a>
                 </td>
               </tr>

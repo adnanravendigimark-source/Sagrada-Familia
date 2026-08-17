@@ -6,6 +6,7 @@ import { LockIcon } from "./icons";
 export default function TourCard({
   tour,
   recommended,
+  bookNowText = "Book Now",
 }: {
   tour: Tour;
   recommended?: {
@@ -13,6 +14,7 @@ export default function TourCard({
     reasons: string[];
     urgencyText: string;
   };
+  bookNowText?: string;
 }) {
   return (
     <div
@@ -100,7 +102,7 @@ export default function TourCard({
                 rel="noopener nofollow sponsored"
                 className="flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-gold-500 to-gold-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
               >
-                Book Now
+                {bookNowText}
               </a>
             </div>
             {recommended.urgencyText && (
@@ -127,7 +129,7 @@ export default function TourCard({
               rel="noopener nofollow sponsored"
               className="rounded-full bg-basilica-terracotta px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-basilica-terracotta/90 hover:shadow-md"
             >
-              Book Now
+              {bookNowText}
             </a>
           </div>
         )}

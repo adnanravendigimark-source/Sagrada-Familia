@@ -1,10 +1,12 @@
 import Link from "next/link";
 import SafeImage from "./SafeImage";
 import { getPosts } from "@/lib/posts";
+import { getHomepageContent } from "@/lib/homepage";
 
 export default async function BlogSection() {
-  const allPosts = await getPosts();
+  const [allPosts, { sections }] = await Promise.all([getPosts(), getHomepageContent()]);
   const posts = allPosts.filter((p) => !p.noIndex).slice(0, 3);
+  const s = sections.blogTeaser;
 
   if (posts.length === 0) return null;
 
@@ -14,20 +16,20 @@ export default async function BlogSection() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-basilica-teal">
-              From the Blog
+              {s.eyebrow}
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-              Sagrada Familia Guides &amp; Tips
+              {s.heading}
             </h2>
             <p className="mt-3 max-w-2xl text-base text-stone-600">
-              Expert advice, ticket comparisons, and insider tips to help you plan your visit and choose the best guided tour.
+              {s.subheading}
             </p>
           </div>
           <Link
             href="/blog"
             className="inline-flex items-center justify-center gap-2 self-start md:self-auto rounded-full border-2 border-basilica-terracotta bg-white px-6 py-2.5 text-sm font-semibold text-basilica-terracotta transition hover:bg-basilica-terracotta hover:text-white shadow-sm hover:shadow-md"
           >
-            <span>View All Articles</span>
+            <span>{s.viewAllText}</span>
             <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -65,7 +67,7 @@ export default async function BlogSection() {
                     href={`/blog/${post.slug}`}
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-basilica-terracotta transition group-hover:gap-2"
                   >
-                    <span>Read Article</span>
+                    <span>{s.readArticleText}</span>
                     <span aria-hidden="true">→</span>
                   </Link>
                 </div>
@@ -79,7 +81,7 @@ export default async function BlogSection() {
             href="/blog"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90 shadow-sm"
           >
-            <span>View All Articles</span>
+            <span>{s.viewAllText}</span>
             <span aria-hidden="true">→</span>
           </Link>
         </div>

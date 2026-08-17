@@ -18,6 +18,8 @@ export default function Logo({
   theme = "light",
   src = "",
   alt = "La Sagrada Familia Guided Tours",
+  line1 = "La Sagrada Familia",
+  line2 = "Guided Tours",
 }: {
   className?: string;
   variant?: "compact" | "stacked";
@@ -26,6 +28,11 @@ export default function Logo({
   // default) keeps using the bundled Logo.png asset below, unchanged.
   src?: string;
   alt?: string;
+  // Two-line wordmark text shown next to the icon in the compact variant
+  // only — the stacked variant's artwork already has the wordmark baked
+  // into the image itself.
+  line1?: string;
+  line2?: string;
 }) {
   const isDark = theme === "dark";
   const customSrc = src.trim();
@@ -69,14 +76,14 @@ export default function Logo({
             isDark ? "text-white" : "text-stone-900"
           }`}
         >
-          La Sagrada Familia
+          {line1}
         </span>
         <span
           className={`block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.24em] ${
             isDark ? "text-gold-400" : "text-basilica-terracotta"
           }`}
         >
-          Guided Tours
+          {line2}
         </span>
       </span>
     </span>

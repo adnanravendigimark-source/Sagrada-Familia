@@ -11,7 +11,7 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-stone-900/10 bg-stone-50/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 sm:px-6">
-        <Logo src={header.logoImage} alt={header.logoAlt} />
+        <Logo src={header.logoImage} alt={header.logoAlt} line1={header.logoLine1} line2={header.logoLine2} />
         <nav className="hidden items-center gap-7 text-sm font-medium text-stone-900/70 md:flex">
           {header.navLinks.map((link) => (
             <Link key={link.href + link.label} href={link.href} className="hover:text-basilica-plum">
