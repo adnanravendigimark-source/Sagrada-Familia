@@ -52,7 +52,7 @@ export default function Logo({
   }
 
   const image = (
-    <span className="relative block h-11 w-[5.75rem] overflow-hidden sm:h-12 sm:w-[6.25rem]">
+    <span className="relative block h-11 w-[5.75rem] shrink-0 overflow-hidden sm:h-12 sm:w-[6.25rem]">
       <Image
         src={customSrc || logo}
         alt={alt}
@@ -65,21 +65,21 @@ export default function Logo({
   );
 
   const wordmark = (
-    <span className="hidden items-center gap-3 sm:flex">
+    <span className="flex min-w-0 items-center gap-3">
       <span
         className={`h-8 w-px shrink-0 ${isDark ? "bg-gold-400/40" : "bg-gold-500/40"}`}
         aria-hidden="true"
       />
-      <span className="leading-tight">
+      <span className="min-w-0 leading-tight">
         <span
-          className={`block whitespace-nowrap font-display text-lg font-semibold italic tracking-tight ${
+          className={`block truncate font-display text-base font-semibold italic tracking-tight sm:text-lg ${
             isDark ? "text-white" : "text-stone-900"
           }`}
         >
           {line1}
         </span>
         <span
-          className={`block whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.24em] ${
+          className={`block truncate text-[10px] font-semibold uppercase tracking-[0.24em] ${
             isDark ? "text-gold-400" : "text-basilica-terracotta"
           }`}
         >
@@ -90,9 +90,12 @@ export default function Logo({
   );
 
   // Logo.png itself has no background baked in, so both themes render it
-  // the same way — no extra white card behind it.
+  // the same way — no extra white card behind it. min-w-0 lets the wordmark
+  // actually shrink/truncate on narrow screens instead of forcing the
+  // header to overflow (or collide with the mobile hamburger) when an
+  // admin-entered site name is long — see MobileNav.tsx.
   return (
-    <Link href="/" className={`inline-flex items-center gap-3 ${className}`}>
+    <Link href="/" className={`inline-flex min-w-0 items-center gap-3 ${className}`}>
       {image}
       {wordmark}
     </Link>
