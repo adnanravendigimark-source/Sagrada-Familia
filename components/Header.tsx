@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
+import MobileNav from "./MobileNav";
 import { getSiteChrome } from "@/lib/homepage";
 
 // Navbar — logo, nav links, and the CTA button are all CMS-editable from
@@ -19,12 +20,15 @@ export default async function Header() {
             </Link>
           ))}
         </nav>
-        <Link
-          href={header.ctaHref}
-          className="rounded-full bg-basilica-terracotta px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-basilica-terracotta/90"
-        >
-          {header.ctaText}
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={header.ctaHref}
+            className="hidden rounded-full bg-basilica-terracotta px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-basilica-terracotta/90 md:inline-flex"
+          >
+            {header.ctaText}
+          </Link>
+          <MobileNav navLinks={header.navLinks} ctaText={header.ctaText} ctaHref={header.ctaHref} />
+        </div>
       </div>
     </header>
   );
