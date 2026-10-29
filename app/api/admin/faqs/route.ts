@@ -1,3 +1,4 @@
+import { withSiteRevalidate } from "@/lib/revalidateSite";
 import { NextResponse } from "next/server";
 import { getFaqs, saveFaqs, type FAQ } from "@/lib/data";
 import { dbErrorMessage } from "@/lib/db";
@@ -13,7 +14,7 @@ export async function GET() {
   return NextResponse.json(await getFaqs());
 }
 
-export async function PUT(req: Request) {
+async function PUTHandler(req: Request) {
   try {
     const body = (await req.json().catch(() => null)) as FAQ[] | null;
     if (!Array.isArray(body)) {
@@ -25,3 +26,5 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: dbErrorMessage(err) }, { status: 500 });
   }
 }
+
+export const PUT = withSiteRevalidate(PUTHandler);

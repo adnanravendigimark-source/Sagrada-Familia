@@ -1,3 +1,4 @@
+import { withSiteRevalidate } from "@/lib/revalidateSite";
 import { NextResponse } from "next/server";
 import { getHomepageContent, saveRecommendedTour, type HomepageContent } from "@/lib/homepage";
 import { dbErrorMessage } from "@/lib/db";
@@ -18,7 +19,7 @@ export async function GET() {
 // deliberately left untouched here even though the client still posts the
 // full HomepageContent shape (harmless — see saveRecommendedTour's comment
 // in lib/homepage.ts for why this split exists).
-export async function PUT(req: Request) {
+async function PUTHandler(req: Request) {
   try {
     const body = (await req.json().catch(() => null)) as HomepageContent | null;
     if (!body) {
@@ -36,3 +37,5 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: dbErrorMessage(err) }, { status: 500 });
   }
 }
+
+export const PUT = withSiteRevalidate(PUTHandler);

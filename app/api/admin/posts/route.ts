@@ -1,3 +1,4 @@
+import { withSiteRevalidate } from "@/lib/revalidateSite";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getPosts, savePosts, type Post } from "@/lib/posts";
@@ -14,7 +15,7 @@ export async function GET() {
   return NextResponse.json(await getPosts());
 }
 
-export async function POST(req: Request) {
+async function POSTHandler(req: Request) {
   try {
     const body = (await req.json().catch(() => null)) as Post | null;
     if (!body) {
@@ -53,3 +54,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: dbErrorMessage(err) }, { status: 500 });
   }
 }
+
+export const POST = withSiteRevalidate(POSTHandler);
