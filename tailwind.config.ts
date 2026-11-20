@@ -17,6 +17,9 @@ const config: Config = {
           400: "rgb(var(--color-gold-400) / <alpha-value>)",
           500: "#c1892c",
           600: "#a3701f",
+          // Small gold text (labels, notes): gold-600 is 4.3:1 on white,
+          // this passes WCAG AA (5.7:1).
+          700: "#8a5e17",
         },
         // basilica.* and gold.400 are backed by CSS variables (defaults in
         // globals.css :root) instead of fixed hex, so the admin-editable

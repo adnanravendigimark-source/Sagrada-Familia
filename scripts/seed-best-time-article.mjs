@@ -80,7 +80,7 @@ const postData = {
   sortOrder: 0,
   noIndex: false,
   noFollow: false,
-  canonicalUrl: "https://www.sagradafamiliatours.com/blog/when-is-the-best-time-to-visit-sagrada-familia",
+  canonicalUrl: "",
   ogTitle: "Best Time to Visit Sagrada Família: Seasons, Hours & Crowds",
   ogDescription: "Discover the best time to visit Sagrada Familia for crowd-free entry, radiant stained-glass light, and ideal weather. Complete season, month, and hourly guide.",
   ogImage: heroImageUrl,

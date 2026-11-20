@@ -4,6 +4,13 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Admin toast notifications (components/admin/Toast.tsx) — slide/fade in
@@ -21,6 +28,7 @@ html {
 
 body {
   color: #241f1a;
+  overflow-x: clip;
 }
 
 /* Default brand-color CSS variables — space-separated RGB triplets (not
@@ -31,7 +39,7 @@ body {
    are what the live site already looked like before that panel existed,
    so an untouched site renders pixel-identical to before. */
 :root {
-  --color-basilica-terracotta: 196 85 47; /* #c4552f */
+  --color-basilica-terracotta: 187 79 43; /* #bb4f2b — darkened from #c4552f for WCAG AA (4.9:1 with white text) */
   --color-basilica-teal: 15 92 92; /* #0f5c5c */
   --color-basilica-plum: 74 37 69; /* #4a2545 */
   --color-gold-400: 217 164 65; /* #d9a441 */

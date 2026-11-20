@@ -5,7 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { MailIcon } from "@/components/icons";
 import { getContactPage } from "@/lib/contact";
 import { getIconComponent } from "@/lib/iconMap";
-import { resolveRobots, resolveCanonical, resolveOg } from "@/lib/seo";
+import { resolveRobots, resolveCanonical, resolveOg, pageTitle } from "@/lib/seo";
 
 
 // Every field below (title, description, canonical, indexing, follow, OG)
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     { title: contact.metaTitle, description: contact.metaDescription }
   );
   return {
-    title: contact.metaTitle,
+    title: pageTitle(contact.metaTitle),
     description: contact.metaDescription,
     alternates: { canonical: resolveCanonical("/contact", contact.canonicalUrl) },
     robots: resolveRobots(contact.noIndex, contact.noFollow),
@@ -42,7 +42,7 @@ export default async function ContactPage() {
             {contact.heroHeading}
           </h1>
           <div
-            className="rich-content mx-auto mt-3 max-w-md text-stone-900/60"
+            className="rich-content mx-auto mt-3 max-w-md text-stone-900/70"
             dangerouslySetInnerHTML={{ __html: contact.heroSubheading }}
           />
         </div>
@@ -53,7 +53,7 @@ export default async function ContactPage() {
             <MailIcon className="h-6 w-6" />
           </span>
           <div>
-            <p className="text-sm text-stone-900/60">{contact.emailLabel}</p>
+            <p className="text-sm text-stone-900/70">{contact.emailLabel}</p>
             <a
               href={`mailto:${contact.email}`}
               className="mt-1 block break-all font-display text-lg font-semibold text-basilica-terracotta"
@@ -61,7 +61,7 @@ export default async function ContactPage() {
               {contact.email}
             </a>
           </div>
-          <p className="text-xs text-stone-900/50">{contact.emailNote}</p>
+          <p className="text-xs text-stone-900/65">{contact.emailNote}</p>
         </div>
 
         {/* What we can help with */}
@@ -75,7 +75,7 @@ export default async function ContactPage() {
                 </span>
                 <p className="mt-3 text-sm font-semibold text-stone-900">{title}</p>
                 <div
-                  className="rich-content mt-1 text-sm text-stone-900/60"
+                  className="rich-content mt-1 text-sm text-stone-900/70"
                   dangerouslySetInnerHTML={{ __html: body }}
                 />
               </div>
@@ -84,7 +84,7 @@ export default async function ContactPage() {
         </div>
 
         <div
-          className="rich-content mt-12 border-t border-stone-900/10 pt-8 text-center text-sm text-stone-900/60"
+          className="rich-content mt-12 border-t border-stone-900/10 pt-8 text-center text-sm text-stone-900/70"
           dangerouslySetInnerHTML={{ __html: contact.footerNote }}
         />
 
@@ -92,7 +92,7 @@ export default async function ContactPage() {
           <p className="font-medium text-stone-900">{contact.ctaHeading}</p>
           <a
             href="/#tours"
-            className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
+            className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
           >
             {contact.ctaButtonLabel} →
           </a>

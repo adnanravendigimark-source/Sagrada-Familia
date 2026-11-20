@@ -56,6 +56,7 @@ async function PUTHandler(req: Request) {
         heroCtaSecondaryHref: body.heroCtaSecondaryHref || "",
         ratingValue: body.ratingValue,
         ratingCount: body.ratingCount,
+        ratingChecked: body.ratingChecked,
         metaTitle: body.metaTitle || "",
         metaDescription: body.metaDescription || "",
         focusKeyword: body.focusKeyword || "",

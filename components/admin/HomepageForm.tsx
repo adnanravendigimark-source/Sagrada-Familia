@@ -17,6 +17,8 @@ import type {
   TimelineRow,
   HoursRow,
   GalleryImage,
+  OfficialRow,
+  PlanCard,
 } from "@/lib/homepage";
 import type { Tour } from "@/lib/data";
 
@@ -211,6 +213,21 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
     setSaved(false);
   }
 
+  function updateOfficial(patch: Partial<HomepageContent["sections"]["official"]>) {
+    setContent((c) => ({ ...c, sections: { ...c.sections, official: { ...c.sections.official, ...patch } } }));
+    setSaved(false);
+  }
+
+  function updatePlan(patch: Partial<HomepageContent["sections"]["plan"]>) {
+    setContent((c) => ({ ...c, sections: { ...c.sections, plan: { ...c.sections.plan, ...patch } } }));
+    setSaved(false);
+  }
+
+  function updateFinalCta(patch: Partial<HomepageContent["sections"]["finalCta"]>) {
+    setContent((c) => ({ ...c, sections: { ...c.sections, finalCta: { ...c.sections.finalCta, ...patch } } }));
+    setSaved(false);
+  }
+
   function updateBlogTeaser(patch: Partial<HomepageContent["sections"]["blogTeaser"]>) {
     setContent((c) => ({
       ...c,
@@ -357,6 +374,9 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
                 <input value={content.header.bookNowText} onChange={(e) => updateHeader({ bookNowText: e.target.value })} className={inputClass} />
               </Field>
             </div>
+            <Field label="Affiliate note next to booking buttons" hint="Shown under the tour grid, price table, blog promo and sidebar. Blank = default text. The footer disclosure is separate.">
+              <input value={content.header.affiliateNote || ""} onChange={(e) => updateHeader({ affiliateNote: e.target.value })} className={inputClass} />
+            </Field>
           </SectionCard>
 
           <SectionCard
@@ -381,6 +401,9 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
               </Field>
               <Field label="Rating count label" hint="e.g. 1,200+ reviews">
                 <input value={content.ratingCount} onChange={(e) => update("ratingCount", e.target.value)} className={inputClass} />
+              </Field>
+              <Field label="Rating last checked" hint="Shown as “checked Nov 2026”">
+                <input type="date" value={content.ratingChecked || ""} onChange={(e) => update("ratingChecked", e.target.value)} className={inputClass} />
               </Field>
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
@@ -527,6 +550,12 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
               <Field label="Button link">
                 <input value={content.sections.tower.ctaHref} onChange={(e) => updateTower({ ctaHref: e.target.value })} className={inputClass} />
               </Field>
+              <Field label="Guide link text">
+                <input value={content.sections.tower.guideLinkText} onChange={(e) => updateTower({ guideLinkText: e.target.value })} className={inputClass} />
+              </Field>
+              <Field label="Guide link (a /blog/… path)">
+                <input value={content.sections.tower.guideHref} onChange={(e) => updateTower({ guideHref: e.target.value })} className={inputClass} />
+              </Field>
             </div>
           </SectionCard>
 
@@ -549,11 +578,19 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
                 renderItem={(row, upd) => (
                   <div className="grid gap-2 sm:grid-cols-2">
                     <input value={row.range} onChange={(e) => upd({ ...row, range: e.target.value })} placeholder="e.g. April – September" className={inputClass} />
-                    <input value={row.time} onChange={(e) => upd({ ...row, time: e.target.value })} placeholder="e.g. 9:00 AM – 8:00 PM" className={inputClass} />
+                    <textarea rows={3} value={row.time} onChange={(e) => upd({ ...row, time: e.target.value })} placeholder={"e.g. Mon–Fri 9:00 AM – 8:00 PM\nSun 10:30 AM – 8:00 PM"} className={inputClass} />
                   </div>
                 )}
               />
             </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Hours source link" hint="Official schedule page (https only)">
+                <input value={content.sections.practical.hoursSourceUrl || ""} onChange={(e) => updatePractical({ hoursSourceUrl: e.target.value })} placeholder="https://sagradafamilia.org/en/schedules-how-to-get" className={inputClass} />
+              </Field>
+              <Field label="Hours last checked">
+                <input type="date" value={content.sections.practical.hoursChecked || ""} onChange={(e) => updatePractical({ hoursChecked: e.target.value })} className={inputClass} />
+              </Field>
+            </div>
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Address heading">
                 <input value={content.sections.practical.addressHeading} onChange={(e) => updatePractical({ addressHeading: e.target.value })} className={inputClass} />
@@ -681,6 +718,131 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
               </Field>
               <Field label={'"Read article" link text'}>
                 <input value={content.sections.blogTeaser.readArticleText} onChange={(e) => updateBlogTeaser({ readArticleText: e.target.value })} className={inputClass} />
+              </Field>
+            </div>
+            <Field label="Featured posts (shown first)" hint="Post slugs, comma-separated, in order. Empty slots fill with the newest posts. Unknown or hidden posts are skipped.">
+              <input
+                value={(content.sections.blogTeaser.featuredSlugs || []).join(", ")}
+                onChange={(e) =>
+                  updateBlogTeaser({
+                    featuredSlugs: e.target.value.split(",").map((v) => v.trim()).filter(Boolean),
+                  })
+                }
+                placeholder="sagrada-familia-nativity-vs-passion-tower, what-to-see-inside-sagrada-familia"
+                className={inputClass}
+              />
+            </Field>
+          </SectionCard>
+
+          <SectionCard
+            id="sec-official"
+            title="Official ticket or a guided tour?"
+            description="The official ticket prices next to what booking a tour adds. Only enter prices you've checked on the official site."
+            open={!!openSections["sec-official"]}
+            onToggle={() => toggleSection("sec-official")}
+          >
+            <Field label="Heading (H2)">
+              <input value={content.sections.official.heading} onChange={(e) => updateOfficial({ heading: e.target.value })} className={inputClass} />
+            </Field>
+            <Field label="Intro">
+              <RichTextEditor value={content.sections.official.intro} onChange={(html) => updateOfficial({ intro: html })} minHeight="4rem" />
+            </Field>
+            <Field label="Official prices box heading">
+              <input value={content.sections.official.officialHeading} onChange={(e) => updateOfficial({ officialHeading: e.target.value })} className={inputClass} />
+            </Field>
+            <Field label="Official ticket rows">
+              <RepeatableList<OfficialRow>
+                items={content.sections.official.rows}
+                onChange={(rows) => updateOfficial({ rows })}
+                newItem={() => ({ name: "", price: "" })}
+                addLabel="+ Add ticket"
+                renderItem={(item, upd) => (
+                  <div className="grid gap-2 sm:grid-cols-[1fr_8rem]">
+                    <input value={item.name} placeholder="Ticket name" onChange={(e) => upd({ ...item, name: e.target.value })} className={inputClass} />
+                    <input value={item.price} placeholder="€26" onChange={(e) => upd({ ...item, price: e.target.value })} className={inputClass} />
+                  </div>
+                )}
+              />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Source link (https)">
+                <input value={content.sections.official.sourceUrl} onChange={(e) => updateOfficial({ sourceUrl: e.target.value })} className={inputClass} />
+              </Field>
+              <Field label="Prices last checked">
+                <input type="date" value={content.sections.official.checked} onChange={(e) => updateOfficial({ checked: e.target.value })} className={inputClass} />
+              </Field>
+            </div>
+            <Field label="Tour box heading">
+              <input value={content.sections.official.tourHeading} onChange={(e) => updateOfficial({ tourHeading: e.target.value })} className={inputClass} />
+            </Field>
+            <Field label="Tour box points">
+              <RepeatableList<string>
+                items={content.sections.official.tourPoints}
+                onChange={(tourPoints) => updateOfficial({ tourPoints })}
+                newItem={() => ""}
+                addLabel="+ Add point"
+                renderItem={(item, upd) => <input value={item} onChange={(e) => upd(e.target.value)} className={inputClass} />}
+              />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Button text">
+                <input value={content.sections.official.ctaButtonText} onChange={(e) => updateOfficial({ ctaButtonText: e.target.value })} className={inputClass} />
+              </Field>
+              <Field label="Button link">
+                <input value={content.sections.official.ctaHref} onChange={(e) => updateOfficial({ ctaHref: e.target.value })} className={inputClass} />
+              </Field>
+            </div>
+          </SectionCard>
+
+          <SectionCard
+            id="sec-plan"
+            title="Plan your visit cards"
+            description="Short answers that link to the full guides. Links can be /blog/… paths or #anchors on the homepage."
+            open={!!openSections["sec-plan"]}
+            onToggle={() => toggleSection("sec-plan")}
+          >
+            <Field label="Heading (H2)">
+              <input value={content.sections.plan.heading} onChange={(e) => updatePlan({ heading: e.target.value })} className={inputClass} />
+            </Field>
+            <Field label="Cards">
+              <RepeatableList<PlanCard>
+                items={content.sections.plan.cards}
+                onChange={(cards) => updatePlan({ cards })}
+                newItem={() => ({ title: "", body: "", href: "", linkText: "" })}
+                addLabel="+ Add card"
+                renderItem={(item, upd) => (
+                  <div className="grid gap-2">
+                    <input value={item.title} placeholder="Title (H3)" onChange={(e) => upd({ ...item, title: e.target.value })} className={inputClass} />
+                    <textarea rows={2} value={item.body} placeholder="Short answer" onChange={(e) => upd({ ...item, body: e.target.value })} className={inputClass} />
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <input value={item.href} placeholder="/blog/… or #hours" onChange={(e) => upd({ ...item, href: e.target.value })} className={inputClass} />
+                      <input value={item.linkText} placeholder="Link text" onChange={(e) => upd({ ...item, linkText: e.target.value })} className={inputClass} />
+                    </div>
+                  </div>
+                )}
+              />
+            </Field>
+          </SectionCard>
+
+          <SectionCard
+            id="sec-finalcta"
+            title="Final booking band"
+            description="The last band before the footer. Its button books the featured tour."
+            open={!!openSections["sec-finalcta"]}
+            onToggle={() => toggleSection("sec-finalcta")}
+          >
+            <Field label="Heading (H2)">
+              <input value={content.sections.finalCta.heading} onChange={(e) => updateFinalCta({ heading: e.target.value })} className={inputClass} />
+            </Field>
+            <Field label="Text">
+              <textarea rows={2} value={content.sections.finalCta.body} onChange={(e) => updateFinalCta({ body: e.target.value })} className={inputClass} />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Second button text">
+                <input value={content.sections.finalCta.secondaryText} onChange={(e) => updateFinalCta({ secondaryText: e.target.value })} className={inputClass} />
+              </Field>
+              <Field label="Second button link (#anchor or /path)">
+                <input value={content.sections.finalCta.secondaryHref} onChange={(e) => updateFinalCta({ secondaryHref: e.target.value })} className={inputClass} />
               </Field>
             </div>
           </SectionCard>
@@ -997,7 +1159,7 @@ export default function HomepageForm({ initial, tours }: { initial: HomepageCont
 
           <SectionCard title="Brand colors" description="Changes these colors everywhere they're used across the whole site — buttons, links, hero background, ratings. Leave a field blank to keep the default.">
             <div className="grid gap-5 sm:grid-cols-2">
-              <ColorField label="Primary (buttons)" value={content.theme.primary} fallback="#c4552f" onChange={(hex) => updateTheme({ primary: hex })} />
+              <ColorField label="Primary (buttons)" value={content.theme.primary} fallback="#bb4f2b" onChange={(hex) => updateTheme({ primary: hex })} />
               <ColorField label="Secondary (links, accents)" value={content.theme.secondary} fallback="#0f5c5c" onChange={(hex) => updateTheme({ secondary: hex })} />
               <ColorField label="Dark (hero background)" value={content.theme.dark} fallback="#4a2545" onChange={(hex) => updateTheme({ dark: hex })} />
               <ColorField label="Accent (ratings, badges)" value={content.theme.accent} fallback="#d9a441" onChange={(hex) => updateTheme({ accent: hex })} />

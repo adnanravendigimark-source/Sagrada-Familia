@@ -289,6 +289,20 @@ async function createTables() {
 // falls back to the exact copy that used to be hardcoded whenever a column
 // is empty, so running this never changes anything visible until an admin
 // actually edits a field in the new /admin/homepage tabs.
+// "Last checked" dates for third-party facts (ratings, review counts,
+// durations, prices) plus the rating's source label. All nullable/defaulted,
+// so existing rows are untouched until an admin fills them in.
+async function addFactCheckColumns() {
+  console.log("Ensuring fact-check columns exist on tours/homepage...");
+  await sql`ALTER TABLE tours ADD COLUMN IF NOT EXISTS rating_source TEXT NOT NULL DEFAULT 'GetYourGuide'`;
+  await sql`ALTER TABLE tours ADD COLUMN IF NOT EXISTS last_checked DATE`;
+  await sql`ALTER TABLE tours ADD COLUMN IF NOT EXISTS price_checked DATE`;
+  await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS rating_checked DATE`;
+  await sql`ALTER TABLE tours ADD COLUMN IF NOT EXISTS cta_label TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE posts ADD COLUMN IF NOT EXISTS last_checked DATE`;
+  await sql`ALTER TABLE tours ADD COLUMN IF NOT EXISTS cancellation TEXT NOT NULL DEFAULT ''`;
+}
+
 async function addHomepageCmsColumns() {
   console.log("Ensuring full homepage-CMS columns exist on homepage...");
   await sql`ALTER TABLE homepage ADD COLUMN IF NOT EXISTS hero_gallery JSONB NOT NULL DEFAULT '[]'`;
@@ -762,6 +776,7 @@ async function main() {
   await addHomepageCmsColumns();
   await addBlogCmsColumns();
   await addMediaLibraryTable();
+  await addFactCheckColumns();
   await seedTours();
   await seedComboOffers();
   await seedPosts();

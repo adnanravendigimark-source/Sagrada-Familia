@@ -12,24 +12,38 @@ export default function TableOfContents({ items, label = "In This Guide" }: { it
   const sections = items.filter((item) => item.level === 2);
   if (sections.length < 2) return null;
 
+  const list = (
+    <ul className="mt-3 space-y-2 text-sm">
+      {sections.map((item) => (
+        <li key={item.id}>
+          <a
+            href={`#${item.id}`}
+            className="flex items-center gap-1.5 text-stone-700 transition hover:text-basilica-terracotta"
+          >
+            <span aria-hidden="true" className="text-basilica-terracotta">
+              ›
+            </span>
+            {item.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+
+  // Mobile: collapsed by default (native <details>, no JS) so a long guide's
+  // 20+ headings don't push the article a full screen down. Desktop: open.
   return (
-    <div className="mt-8 rounded-2xl border border-stone-200 bg-stone-50 p-5">
-      <p className="text-xs font-semibold uppercase tracking-wider text-basilica-terracotta">{label}</p>
-      <ul className="mt-3 space-y-2 text-sm">
-        {sections.map((item) => (
-          <li key={item.id}>
-            <a
-              href={`#${item.id}`}
-              className="flex items-center gap-1.5 text-stone-700 transition hover:text-basilica-terracotta"
-            >
-              <span aria-hidden="true" className="text-basilica-terracotta">
-                ›
-              </span>
-              {item.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <details className="mt-8 rounded-2xl border border-stone-200 bg-stone-50 p-5 lg:hidden">
+        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-basilica-terracotta">
+          {label} <span className="font-normal normal-case text-stone-500">({sections.length} sections)</span>
+        </summary>
+        {list}
+      </details>
+      <div className="mt-8 hidden rounded-2xl border border-stone-200 bg-stone-50 p-5 lg:block">
+        <p className="text-xs font-semibold uppercase tracking-wider text-basilica-terracotta">{label}</p>
+        {list}
+      </div>
+    </>
   );
 }

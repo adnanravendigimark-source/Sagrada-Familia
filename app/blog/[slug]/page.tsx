@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatCheckedDate } from "@/lib/checkedDate";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import Header from "@/components/Header";
@@ -7,12 +8,13 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import QuickAnswer from "@/components/QuickAnswer";
 import TableOfContents from "@/components/TableOfContents";
 import BlogPostBody from "@/components/BlogPostBody";
+import RecommendedTour from "@/components/RecommendedTour";
 import BlogSidebar from "@/components/BlogSidebar";
 import SafeImage from "@/components/SafeImage";
 import { getPost } from "@/lib/posts";
 import { getRedirectTarget } from "@/lib/redirects";
 import { getHomepageContent } from "@/lib/homepage";
-import { resolveRobots, resolveCanonical, resolveOg, buildArticleJsonLd } from "@/lib/seo";
+import { resolveRobots, resolveCanonical, resolveOg, buildArticleJsonLd, pageTitle } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { extractTableOfContents } from "@/lib/tableOfContents";
 
@@ -41,7 +43,7 @@ export async function generateMetadata({
     { title: post.metaTitle, description: post.metaDescription, image: post.image }
   );
   return {
-    title: post.metaTitle,
+    title: pageTitle(post.metaTitle),
     description: post.metaDescription,
     alternates: { canonical: resolveCanonical(`/blog/${params.slug}`, post.canonicalUrl) },
     robots: resolveRobots(post.noIndex, post.noFollow),
@@ -90,14 +92,22 @@ export default async function Post({ params }: { params: { slug: string } }) {
   return (
     <>
       <Header />
-      <Breadcrumbs items={[{ name: "Blog", path: "/blog" }, { name: post.category, path: `/blog/${post.slug}` }]} />
+      <Breadcrumbs items={[{ name: "Blog", path: "/blog" }, { name: post.title, path: `/blog/${post.slug}` }]} />
       <main>
         <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
           <Link href="/blog" className="text-sm font-medium text-basilica-teal">{s.backToGuidesText}</Link>
           <div className="mt-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-basilica-teal">
             <span>{post.category}</span>
             <span className="h-1 w-1 rounded-full bg-stone-900/20" />
-            <span className="text-stone-900/40">{post.readTime}</span>
+            <span className="text-stone-900/65">{post.readTime}</span>
+            {formatCheckedDate(post.lastChecked) && (
+              <>
+                <span className="h-1 w-1 rounded-full bg-stone-900/20" />
+                <span className="normal-case tracking-normal text-stone-900/65">
+                  Facts checked {formatCheckedDate(post.lastChecked)}
+                </span>
+              </>
+            )}
           </div>
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
             {post.title}
@@ -117,22 +127,23 @@ export default async function Post({ params }: { params: { slug: string } }) {
 
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:grid-cols-[1fr_20rem] lg:gap-10">
           <div>
-            <TableOfContents items={toc} label={s.tocLabel} />
-
             <QuickAnswer label={s.quickAnswerLabel}>{post.quickAnswer}</QuickAnswer>
 
-            <BlogPostBody
-              content={contentHtml}
-              recommendedTourId={post.recommendedTourId}
-              showRecommendedTour={!!post.recommendedTourAfterBlock}
-            />
+            {/* The post's booking box sits right after the Quick Answer — the
+                point where a reader has their answer and is deciding — rather
+                than after 2,000+ words. Same admin toggle and tour picker. */}
+            {!!post.recommendedTourAfterBlock && <RecommendedTour tourId={post.recommendedTourId} />}
+
+            <TableOfContents items={toc} label={s.tocLabel} />
+
+            <BlogPostBody content={contentHtml} recommendedTourId={post.recommendedTourId} showRecommendedTour={false} />
 
             <div className="mt-10 rounded-2xl border border-basilica-teal/20 bg-basilica-teal/5 p-6">
               <p className="text-sm font-semibold text-stone-900">{post.ctaHeading}</p>
               <p className="mt-1 text-sm text-stone-900/70">{post.ctaBody}</p>
               <Link
                 href={post.ctaButtonHref}
-                className="mt-4 inline-flex rounded-full bg-basilica-terracotta px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
+                className="mt-4 inline-flex rounded-full bg-basilica-terracotta px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-90"
               >
                 {post.ctaButtonText}
               </Link>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AffiliateClickTracker from "@/components/AffiliateClickTracker";
 import Script from "next/script";
 import { Cormorant_Garamond } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
@@ -53,6 +54,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "Sagrada Familia Guided Tours",
   url: SITE_URL,
+  logo: `${SITE_URL}/icon.png`,
   description:
     "Independent guide comparing Sagrada Familia guided tours, skip-the-line tickets, and tower access from licensed operators.",
 };
@@ -85,18 +87,15 @@ export function generateMetadata(): Metadata {
     // Kept under 155 characters for the same reason.
     description:
       "Compare Sagrada Familia guided tours and skip-the-line tickets. Certified local guides, tower access, and instant online booking for 2026.",
+    // Google ignores meta keywords; kept short and accurate for other engines.
     keywords: [
-      "Sagrada Familia guided tour",
-      "Sagrada Familia tower access",
+      "Sagrada Familia tours",
       "Sagrada Familia tickets",
-      "book Sagrada Familia tour",
-      "Sagrada Familia tour price",
-      "Sagrada Familia tickets online",
-      "skip the line Sagrada Familia",
-      "Sagrada Familia skip the line tickets",
-      "Nativity tower vs Passion tower",
-      "is a guided tour worth it Sagrada Familia",
-      "Barcelona guided tours",
+      "Sagrada Familia guided tour",
+      "Sagrada Familia tower tickets",
+      "Sagrada Familia skip the line",
+      "Sagrada Familia opening hours",
+      "Nativity or Passion tower",
     ],
     alternates: {
       canonical: "/",
@@ -170,13 +169,14 @@ export default async function RootLayout({
           `}
         </Script>
       </head>
-      <body className="font-body bg-stone-50 text-stone-900 antialiased">
+      <body className="font-body bg-white text-stone-900 antialiased">
         {/* :root custom properties apply from anywhere in the document, so
             this doesn't need to live in <head> — Next.js's metadata API
             already owns <head> in the App Router, and manually adding one
             here would conflict with it. */}
         {themeStyle && <style dangerouslySetInnerHTML={{ __html: themeStyle }} />}
         {children}
+        <AffiliateClickTracker />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

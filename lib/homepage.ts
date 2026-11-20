@@ -1,4 +1,5 @@
 import { sql } from "./db";
+import { toIsoDate } from "./checkedDate";
 
 export interface GalleryImage {
   src: string;
@@ -37,6 +38,46 @@ export interface TourSection {
   subheading: string;
 }
 
+// "Official ticket or a guided tour?" — an honest side-by-side of the
+// basilica's own ticket prices and what booking a tour adds.
+export interface OfficialRow {
+  name: string;
+  price: string; // display text, e.g. "€26"
+}
+export interface OfficialSection {
+  heading: string;
+  intro: string; // rich text HTML
+  officialHeading: string;
+  rows: OfficialRow[];
+  sourceUrl: string; // must be https; shown as the source link
+  checked: string; // YYYY-MM-DD
+  tourHeading: string;
+  tourPoints: string[];
+  ctaButtonText: string;
+  ctaHref: string;
+}
+
+// "Plan your visit" cards (each links to a guide or an anchor).
+export interface PlanCard {
+  title: string;
+  body: string;
+  href: string;
+  linkText: string;
+}
+export interface PlanSection {
+  heading: string;
+  cards: PlanCard[];
+}
+
+// Last booking band before the footer. The button goes to the featured
+// tour's booking link (its own button text).
+export interface FinalCtaSection {
+  heading: string;
+  body: string;
+  secondaryText: string;
+  secondaryHref: string;
+}
+
 // "Why a Guided Tour" section (the timeline + what-you'll-learn section
 // right below the tour grid).
 export interface WhySection {
@@ -67,6 +108,8 @@ export interface TowerSection {
   bullets: string[];
   ctaButtonText: string;
   ctaHref: string;
+  guideLinkText: string; // secondary link to the towers guide
+  guideHref: string;
   images: GalleryImage[];
 }
 
@@ -74,6 +117,10 @@ export interface TowerSection {
 export interface PracticalSection {
   hoursHeading: string;
   hours: HoursRow[];
+  // Where the hours come from and when they were last checked there —
+  // shown under the table as "Official hours · checked 20 Nov 2026".
+  hoursSourceUrl?: string;
+  hoursChecked?: string; // YYYY-MM-DD
   addressHeading: string;
   address: string;
   metro: string;
@@ -124,6 +171,9 @@ export interface BlogTeaserSection {
   subheading: string;
   viewAllText: string;
   readArticleText: string;
+  // Post slugs to show first, in this order (e.g. the posts that bring in
+  // the most search traffic). Remaining slots fill with the newest posts.
+  featuredSlugs?: string[];
 }
 
 // Shared labels used across the blog listing page and every article page.
@@ -155,6 +205,9 @@ export interface HomepageSections {
   notFound: NotFoundSection;
   blogTeaser: BlogTeaserSection;
   blogPage: BlogPageSection;
+  official: OfficialSection;
+  plan: PlanSection;
+  finalCta: FinalCtaSection;
 }
 
 // Site-wide navbar — edited from the Homepage admin tab for simplicity,
@@ -174,6 +227,19 @@ export interface HeaderContent {
   homeLabel: string;
   // Used on every tour card, the mobile sticky bar, and the blog sidebar.
   bookNowText: string;
+  // Short affiliate disclosure shown right next to booking buttons (tour
+  // grid, price table, in-post promo, blog sidebar). The full disclosure
+  // stays in the footer; this is the "near the link" version.
+  affiliateNote: string;
+}
+
+export const DEFAULT_AFFILIATE_NOTE =
+  "We earn a commission if you book through these links, at no extra cost to you.";
+
+// Blank in the admin falls back to the default: the disclosure next to
+// booking links should never disappear by accident.
+export function affiliateNoteText(header: Pick<HeaderContent, "affiliateNote">): string {
+  return header.affiliateNote?.trim() || DEFAULT_AFFILIATE_NOTE;
 }
 
 // Site-wide footer — same "edited from Homepage, rendered everywhere" deal.
@@ -209,6 +275,7 @@ export interface HomepageContent {
   heroCtaSecondaryHref: string;
   ratingValue: string;
   ratingCount: string;
+  ratingChecked?: string; // YYYY-MM-DD — shown as "checked Nov 2026"
   // "Featured/Recommended Tour" widget — a compact sticky bar on mobile,
   // a richer showcase card on desktop. Which tour it promotes and its
   // copy are both editable from /admin/recommended.
@@ -270,6 +337,7 @@ export const DEFAULT_HEADER: HeaderContent = {
   logoLine2: "Guided Tours",
   homeLabel: "Home",
   bookNowText: "Book Now",
+  affiliateNote: DEFAULT_AFFILIATE_NOTE,
 };
 
 export const DEFAULT_FOOTER: FooterContent = {
@@ -303,7 +371,7 @@ export const DEFAULT_FOOTER: FooterContent = {
 };
 
 export const DEFAULT_THEME: ThemeColors = {
-  primary: "#c4552f",
+  primary: "#bb4f2b",
   secondary: "#0f5c5c",
   dark: "#4a2545",
   accent: "#d9a441",
@@ -378,6 +446,8 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     ],
     ctaButtonText: "See Tours with Tower Access",
     ctaHref: "#tours",
+    guideLinkText: "Nativity or Passion: which tower?",
+    guideHref: "/blog/sagrada-familia-nativity-vs-passion-tower",
     images: [
       {
         src: "https://images.unsplash.com/photo-1728249960363-13079cc2c6f6?q=80&w=700&auto=format&fit=crop",
@@ -447,6 +517,63 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     viewAllText: "View All Articles",
     readArticleText: "Read Article",
   },
+  official: {
+    heading: "Official ticket or a guided tour?",
+    intro:
+      "<p>The cheapest way in is an official ticket from the basilica's own website. Booking a tour on GetYourGuide costs more, but adds a local guide on the tours and more flexible cancellation.</p>",
+    officialHeading: "Official tickets (adult, from)",
+    rows: [
+      { name: "Basilica entry with audio guide app", price: "€26" },
+      { name: "Basilica with official guided visit", price: "€30" },
+      { name: "Basilica entry and one tower", price: "€36" },
+      { name: "Guided visit and one tower", price: "€40" },
+    ],
+    sourceUrl: "https://sagradafamilia.org/en/tickets",
+    checked: "",
+    tourHeading: "What booking a tour here adds",
+    tourPoints: [
+      "A 1.5-hour visit with a local guide and a headset",
+      "Free cancellation up to 24 hours before on the guided tours (2 days on the entry ticket)",
+      "Reserve now and pay later on the guided tours",
+    ],
+    ctaButtonText: "See the guided tour",
+    ctaHref: "#tours",
+  },
+  plan: {
+    heading: "Plan your visit",
+    cards: [
+      {
+        title: "How long is a Sagrada Família tour?",
+        body: "The guided tours here take 1.5 hours. Allow about 30 minutes more if you add a tower.",
+        href: "/blog/how-long-do-you-need-at-sagrada-familia",
+        linkText: "How long you need",
+      },
+      {
+        title: "Opening hours 2026",
+        body: "Opens at 9:00 Monday to Saturday and 10:30 on Sunday. Closing time changes with the season.",
+        href: "#hours",
+        linkText: "See all opening hours",
+      },
+      {
+        title: "Dress code",
+        body: "Check what to wear and what you can bring before your time slot.",
+        href: "/blog/sagrada-familia-dress-code",
+        linkText: "Read the dress code",
+      },
+      {
+        title: "Best time to visit",
+        body: "Morning light brings out the cool blue-green glass on the Nativity side; afternoon light, the warm reds on the Passion side.",
+        href: "/blog/when-is-the-best-time-to-visit-sagrada-familia",
+        linkText: "Find the best time",
+      },
+    ],
+  },
+  finalCta: {
+    heading: "Ready to pick a date?",
+    body: "The 1.5-hour guided tour is our pick for a first visit. Check live dates on GetYourGuide; you can cancel free up to 24 hours before.",
+    secondaryText: "Compare all three options",
+    secondaryHref: "#prices",
+  },
   blogPage: {
     eyebrow: "Guided Tour Blog",
     heading: "Sagrada Familia Travel Guide",
@@ -481,7 +608,9 @@ const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   heroCtaPrimaryHref: "#tours",
   heroCtaSecondaryText: "See Tour Prices",
   heroCtaSecondaryHref: "#prices",
-  ratingValue: "4.8 / 5",
+  // No built-in rating: the hero only shows one an admin has entered with
+  // its source (an unsourced default would be an invented fact).
+  ratingValue: "",
   ratingCount: "",
   showFeaturedTour: false,
   featuredTourId: "",
@@ -552,6 +681,7 @@ function rowToHomepage(row: any): HomepageContent {
     heroCtaSecondaryHref: row.hero_cta_secondary_href || DEFAULT_HOMEPAGE_CONTENT.heroCtaSecondaryHref,
     ratingValue: row.rating_value || "",
     ratingCount: row.rating_count || "",
+    ratingChecked: toIsoDate(row.rating_checked),
     showFeaturedTour: !!row.show_featured_tour,
     featuredTourId: row.featured_tour_id || "",
     featuredBadgeLabel: row.featured_badge_label || "",
@@ -567,6 +697,9 @@ function rowToHomepage(row: any): HomepageContent {
       notFound: { ...DEFAULT_SECTIONS.notFound, ...sectionsRaw.notFound },
       blogTeaser: { ...DEFAULT_SECTIONS.blogTeaser, ...sectionsRaw.blogTeaser },
       blogPage: { ...DEFAULT_SECTIONS.blogPage, ...sectionsRaw.blogPage },
+      official: { ...DEFAULT_SECTIONS.official, ...sectionsRaw.official },
+      plan: { ...DEFAULT_SECTIONS.plan, ...sectionsRaw.plan },
+      finalCta: { ...DEFAULT_SECTIONS.finalCta, ...sectionsRaw.finalCta },
     },
     header: parseJsonWithDefault<HeaderContent>(row.header_json, DEFAULT_HEADER),
     footer: parseJsonWithDefault<FooterContent>(row.footer_json, DEFAULT_FOOTER),
@@ -631,6 +764,7 @@ export async function saveHomepageCopy(data: {
   heroCtaSecondaryHref: string;
   ratingValue: string;
   ratingCount: string;
+  ratingChecked?: string;
   metaTitle: string;
   metaDescription: string;
   focusKeyword: string;
@@ -645,7 +779,7 @@ export async function saveHomepageCopy(data: {
       hero_gallery, hero_cta_primary_text, hero_cta_primary_href,
       hero_cta_secondary_text, hero_cta_secondary_href,
       rating_value, rating_count, meta_title, meta_description, focus_keyword,
-      canonical_url, og_title, og_description, og_image
+      canonical_url, og_title, og_description, og_image, rating_checked
     ) VALUES (
       1, ${data.heroBadge}, ${data.heroHeading}, ${data.heroSubheading}, ${data.heroImage},
       ${data.heroImageAlt}, ${JSON.stringify(data.heroGallery || [])}::jsonb,
@@ -653,7 +787,8 @@ export async function saveHomepageCopy(data: {
       ${data.heroCtaSecondaryText || ""}, ${data.heroCtaSecondaryHref || ""},
       ${data.ratingValue}, ${data.ratingCount},
       ${data.metaTitle || ""}, ${data.metaDescription || ""}, ${data.focusKeyword || ""},
-      ${data.canonicalUrl || ""}, ${data.ogTitle || ""}, ${data.ogDescription || ""}, ${data.ogImage || ""}
+      ${data.canonicalUrl || ""}, ${data.ogTitle || ""}, ${data.ogDescription || ""}, ${data.ogImage || ""},
+      ${toIsoDate(data.ratingChecked) ?? null}
     )
     ON CONFLICT (id) DO UPDATE SET
       hero_badge = EXCLUDED.hero_badge,
@@ -674,7 +809,8 @@ export async function saveHomepageCopy(data: {
       canonical_url = EXCLUDED.canonical_url,
       og_title = EXCLUDED.og_title,
       og_description = EXCLUDED.og_description,
-      og_image = EXCLUDED.og_image
+      og_image = EXCLUDED.og_image,
+      rating_checked = EXCLUDED.rating_checked
   `;
 }
 

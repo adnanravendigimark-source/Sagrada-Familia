@@ -47,7 +47,7 @@ export default function MobileNav({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? "Close menu" : "Open menu"}
-        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-stone-900/70 transition hover:bg-stone-900/5"
+        className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white transition hover:bg-white/10 group-data-[solid=true]:text-stone-900/75 group-data-[solid=true]:hover:bg-stone-900/5"
       >
         <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" stroke="currentColor" strokeWidth={1.8}>
           {open ? (
@@ -65,7 +65,7 @@ export default function MobileNav({
             aria-hidden="true"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute inset-x-0 top-full z-40 max-h-[80vh] overflow-y-auto border-b border-stone-900/10 bg-stone-50 shadow-lg">
+          <div className="absolute inset-x-0 top-full z-40 max-h-[80vh] overflow-y-auto border-b border-stone-900/10 bg-white shadow-lg">
             <nav className="flex flex-col px-4 py-3">
               {navLinks.map((link) => (
                 <Link

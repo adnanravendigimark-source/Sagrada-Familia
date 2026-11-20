@@ -1,4 +1,5 @@
 import RecommendedTour from "./RecommendedTour";
+import { optimizeContentImages } from "@/lib/contentImages";
 
 // Renders a post's article body — a single continuous HTML string from the
 // admin's rich text editor (headings, bold/italic, links, lists, tables,
@@ -19,7 +20,7 @@ export default function BlogPostBody({
 }) {
   return (
     <div className="mt-8 text-[17px] leading-relaxed text-stone-900/80">
-      <div className="rich-content max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
+      <div className="rich-content max-w-none" dangerouslySetInnerHTML={{ __html: optimizeContentImages(content) }} />
       {showRecommendedTour && (
         <div className="mt-5">
           <RecommendedTour tourId={recommendedTourId} />

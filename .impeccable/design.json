@@ -1,0 +1,216 @@
+{
+ "schemaVersion": 2,
+ "generatedAt": "2026-11-20T08:08:14Z",
+ "title": "Design System: Sagrada Familia Guided Tours",
+ "extensions": {
+  "colorMeta": {
+   "basilica-terracotta": {
+    "role": "primary",
+    "displayName": "Basilica Terracotta",
+    "canonical": "rgb(var(--color-basilica-terracotta))",
+    "tonalRamp": [
+     "#3b190e",
+     "#6a2c18",
+     "#9a4023",
+     "#c4552f",
+     "#d57a5a",
+     "#e3a088",
+     "#efc6b6",
+     "#f8e7e0"
+    ]
+   },
+   "basilica-teal": {
+    "role": "secondary",
+    "displayName": "Stained-Glass Teal",
+    "canonical": "rgb(var(--color-basilica-teal))",
+    "tonalRamp": [
+     "#041b1b",
+     "#083333",
+     "#0f5c5c",
+     "#2b7a7a",
+     "#559a9a",
+     "#86baba",
+     "#b8d8d8",
+     "#e5f1f1"
+    ]
+   },
+   "mosaic-gold": {
+    "role": "tertiary",
+    "displayName": "Mosaic Gold",
+    "canonical": "rgb(var(--color-gold-400))",
+    "tonalRamp": [
+     "#3d2c0c",
+     "#6b4e17",
+     "#a3701f",
+     "#c1892c",
+     "#d9a441",
+     "#e6c07a",
+     "#f0d9ae",
+     "#faf1df"
+    ]
+   },
+   "basilica-plum": {
+    "role": "tertiary",
+    "displayName": "Basilica Plum",
+    "canonical": "rgb(var(--color-basilica-plum))",
+    "tonalRamp": [
+     "#1a0c18",
+     "#33182f",
+     "#4a2545",
+     "#6b4366",
+     "#8f6889",
+     "#b392ae",
+     "#d5c0d2",
+     "#f1e8ef"
+    ]
+   },
+   "stone-paper": {
+    "role": "neutral",
+    "displayName": "Stone Paper"
+   },
+   "stone-ink": {
+    "role": "neutral",
+    "displayName": "Stone Ink"
+   }
+  },
+  "shadows": [
+   {
+    "name": "rest",
+    "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    "purpose": "Cards and boxes at rest."
+   },
+   {
+    "name": "lift",
+    "value": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+    "purpose": "Tour card on hover, with translateY(-4px)."
+   },
+   {
+    "name": "sticky-bar",
+    "value": "0 -6px 20px rgba(0,0,0,0.12)",
+    "purpose": "Mobile bottom booking bar."
+   }
+  ],
+  "motion": [
+   {
+    "name": "card-lift",
+    "value": "all 300ms ease",
+    "purpose": "Card hover lift."
+   },
+   {
+    "name": "image-zoom",
+    "value": "transform 500ms ease",
+    "purpose": "Card image scale(1.05) on hover."
+   }
+  ],
+  "breakpoints": [
+   {
+    "name": "sm",
+    "value": "640px"
+   },
+   {
+    "name": "md",
+    "value": "768px"
+   },
+   {
+    "name": "lg",
+    "value": "1024px"
+   }
+  ]
+ },
+ "components": [
+  {
+   "name": "Primary Button",
+   "kind": "button",
+   "refersTo": "button-primary",
+   "description": "Booking action on cards, table and promos.",
+   "html": "<a class=\"ds-btn-primary\" href=\"#\">Check dates</a>",
+   "css": ".ds-btn-primary{display:inline-flex;background:rgb(var(--color-basilica-terracotta,196 85 47));color:#fff;padding:10px 20px;border-radius:9999px;font:600 14px system-ui,sans-serif;text-decoration:none;box-shadow:0 1px 2px rgb(0 0 0/.05);transition:background .2s,box-shadow .2s}.ds-btn-primary:hover{background:rgb(var(--color-basilica-terracotta,196 85 47)/.9);box-shadow:0 4px 6px -1px rgb(0 0 0/.1)}.ds-btn-primary:focus-visible{outline:2px solid #0f5c5c;outline-offset:2px}"
+  },
+  {
+   "name": "Recommended Button",
+   "kind": "button",
+   "refersTo": "button-recommended",
+   "description": "Only on the recommended tour card.",
+   "html": "<a class=\"ds-btn-rec\" href=\"#\">Check dates</a>",
+   "css": ".ds-btn-rec{display:inline-flex;background:linear-gradient(90deg,#c1892c,#a3701f);color:#fff;padding:10px 20px;border-radius:9999px;font:600 14px system-ui,sans-serif;text-decoration:none;transition:opacity .2s}.ds-btn-rec:hover{opacity:.9}.ds-btn-rec:focus-visible{outline:2px solid #0f5c5c;outline-offset:2px}"
+  },
+  {
+   "name": "Outline Button",
+   "kind": "button",
+   "refersTo": "button-outline",
+   "description": "Secondary navigation action.",
+   "html": "<a class=\"ds-btn-outline\" href=\"#\">View All Articles →</a>",
+   "css": ".ds-btn-outline{display:inline-flex;gap:8px;background:#fff;color:#c4552f;border:2px solid #c4552f;padding:10px 24px;border-radius:9999px;font:600 14px system-ui,sans-serif;text-decoration:none;transition:background .2s,color .2s}.ds-btn-outline:hover{background:#c4552f;color:#fff}"
+  },
+  {
+   "name": "Ribbon Chip",
+   "kind": "chip",
+   "refersTo": "chip-ribbon",
+   "description": "Recommended / Best Views label over card images.",
+   "html": "<span class=\"ds-ribbon\">★ Recommended</span>",
+   "css": ".ds-ribbon{display:inline-flex;gap:4px;background:linear-gradient(90deg,#c1892c,#a3701f);color:#fff;padding:4px 12px;border-radius:9999px;font:600 12px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.05em}"
+  },
+  {
+   "name": "Tour Card",
+   "kind": "card",
+   "refersTo": "card-tour",
+   "description": "Bookable product with attributed rating and checked note.",
+   "html": "<div class=\"ds-card\"><div class=\"ds-card-img\"><span class=\"ds-rate\">4.7<span style=\"color:#c1892c\">★</span> · 4,850 reviews on GetYourGuide</span></div><div class=\"ds-card-body\"><h3>Skip The Line Guided Tour</h3><p class=\"ds-note\">Rating &amp; duration checked 20 Nov 2026</p><div class=\"ds-foot\"><div><small>FROM</small><b>€54</b></div><a href=\"#\">Check dates</a></div></div></div>",
+   "css": ".ds-card{width:300px;background:#fff;border:1px solid rgb(36 31 26/.08);border-radius:24px;overflow:hidden;box-shadow:0 1px 2px rgb(0 0 0/.05);transition:all .3s}.ds-card:hover{transform:translateY(-4px);box-shadow:0 25px 50px -12px rgb(0 0 0/.25)}.ds-card-img{position:relative;aspect-ratio:4/3;background:#4a2545}.ds-rate{position:absolute;left:12px;bottom:12px;background:rgb(255 255 255/.95);border-radius:9999px;padding:4px 10px;font:12px system-ui,sans-serif;color:rgb(36 31 26/.7)}.ds-card-body{padding:24px}.ds-card-body h3{font:600 16px 'Cormorant Garamond',Georgia,serif;color:#241f1a;margin:0}.ds-note{font:11px system-ui,sans-serif;color:rgb(36 31 26/.45)}.ds-foot{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid rgb(36 31 26/.08);padding-top:20px}.ds-foot small{display:block;font:11px system-ui;color:rgb(36 31 26/.4)}.ds-foot b{font:700 24px 'Cormorant Garamond',serif;color:#241f1a}.ds-foot a{background:#c4552f;color:#fff;border-radius:9999px;padding:10px 20px;font:600 14px system-ui;text-decoration:none}"
+  },
+  {
+   "name": "Quick Answer",
+   "kind": "custom",
+   "refersTo": "callout-quick-answer",
+   "description": "Opens every guide.",
+   "html": "<div class=\"ds-qa\"><b>Quick Answer</b><p>Allow about 1.5 hours for a standard or guided visit.</p></div>",
+   "css": ".ds-qa{border:1px solid rgb(193 137 44/.25);background:rgb(193 137 44/.05);border-radius:16px;padding:20px;font:15px system-ui,sans-serif;color:#241f1a}.ds-qa b{font:600 12px system-ui;text-transform:uppercase;letter-spacing:.05em;color:#a3701f}"
+  }
+ ],
+ "narrative": {
+  "northStar": "The Basilica Guidebook",
+  "overview": "The site reads like a well-made travel guidebook about one building: warm stone paper, confident serif headings, and colour used the way the basilica uses stained glass, in deliberate moments rather than everywhere. A visitor should feel they are being advised by an independent, calm expert, not sold to.",
+  "keyCharacteristics": [
+   "Warm stone paper background with ink-dark text, never pure black on pure white",
+   "Serif display headings, sans-serif for facts, prices and controls",
+   "Terracotta is the action colour; teal is the link/information colour; gold marks ratings and the recommended choice",
+   "Rounded, tactile cards that lift slightly on hover",
+   "Every third-party fact is attributed and dated next to where it appears"
+  ],
+  "rules": [
+   {
+    "name": "The Stained-Glass Rule",
+    "body": "Colour arrives in moments. Terracotta appears only on things you can press; teal only on things that inform or link; gold only on ratings and the recommended pick.",
+    "section": "colors"
+   },
+   {
+    "name": "The Attributed Fact Rule",
+    "body": "Any rating, review count, duration, price or opening hour copied from a third party shows its source and/or checked date next to it.",
+    "section": "colors"
+   },
+   {
+    "name": "The Two-Voice Rule",
+    "body": "Serif speaks about the place; sans states the facts.",
+    "section": "typography"
+   },
+   {
+    "name": "The Lift-On-Intent Rule",
+    "body": "Shadows grow only when a visitor points at something they can act on.",
+    "section": "elevation"
+   }
+  ],
+  "dos": [
+   "Do keep booking buttons terracotta pills with specific labels, and put the affiliate note directly under booking groups.",
+   "Do show rating source and checked dates next to every third-party fact.",
+   "Do use Cormorant Garamond for headings and the system sans for facts, prices and controls.",
+   "Do use real photographs of the basilica, with descriptive alt text, served through the image optimizer.",
+   "Do keep sections on Stone Paper / Stone Mist with 64px vertical rhythm."
+  ],
+  "donts": [
+   "Don't add countdown timers, \"only X left\", \"best price\" stamps, flashing or animated urgency badges, or struck-through prices you can't verify.",
+   "Don't use purple-gradient heroes beyond the existing plum photo overlay, glassmorphism beyond the hero rating card, or generic three-icon feature grids.",
+   "Don't put ratings or reviews into structured data; they belong to the booking provider.",
+   "Don't introduce a new accent colour; extend with tints of terracotta, teal, gold or plum."
+  ]
+ }
+}

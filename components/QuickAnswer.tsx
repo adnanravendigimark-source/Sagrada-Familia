@@ -11,9 +11,9 @@ export default function QuickAnswer({
 }) {
   return (
     <div id="quick-answer" className="mt-6 flex scroll-mt-24 gap-3 rounded-2xl border border-gold-500/25 bg-gold-500/5 p-5">
-      <span className="mt-0.5 text-lg text-gold-600">💡</span>
+      <span className="mt-0.5 text-lg text-gold-700">💡</span>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-gold-600">
+        <p className="text-xs font-semibold uppercase tracking-wider text-gold-700">
           {label}
         </p>
         <p className="mt-1 text-sm leading-relaxed text-stone-900/80">{children}</p>

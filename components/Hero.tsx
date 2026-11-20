@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { formatCheckedMonth } from "@/lib/checkedDate";
 import SafeImage from "./SafeImage";
 import StarRating from "./StarRating";
 import { getHomepageContent } from "@/lib/homepage";
@@ -27,7 +28,7 @@ export default async function Hero() {
         <div className="absolute inset-0 bg-mosaic mix-blend-soft-light" aria-hidden="true" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-24 [@media(max-height:900px)]:py-10 sm:px-6 sm:py-32 sm:[@media(max-height:900px)]:py-14">
+      <div className="relative mx-auto max-w-6xl px-4 pb-24 pt-32 [@media(max-height:900px)]:pb-10 [@media(max-height:900px)]:pt-28 sm:px-6 sm:pb-32 sm:pt-40 sm:[@media(max-height:900px)]:pb-14 sm:[@media(max-height:900px)]:pt-28">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold-400 backdrop-blur-sm">
           {content.heroBadge}
         </p>
@@ -43,7 +44,7 @@ export default async function Hero() {
         <div className="mt-8 flex flex-wrap items-center gap-4 [@media(max-height:900px)]:mt-4">
           <a
             href={content.heroCtaPrimaryHref}
-            className="group inline-flex items-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:bg-basilica-terracotta/90"
+            className="group inline-flex items-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:brightness-90"
           >
             {content.heroCtaPrimaryText}
             <span className="transition group-hover:translate-x-0.5">→</span>
@@ -55,20 +56,32 @@ export default async function Hero() {
             {content.heroCtaSecondaryText}
           </a>
 
-          {/* Floating glass rating card */}
-          <div className="ml-auto flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
-            <div className="text-left leading-tight">
-              <div className="flex items-center gap-2">
-                <StarRating rating={parseFloat(content.ratingValue) || 4.5} size="sm" theme="dark" />
-                <span className="text-sm font-bold text-white">{content.ratingValue}</span>
+          {/* Floating glass rating card — only when an admin has entered a
+              (sourced) rating. Stars only for a plain number like "4.6";
+              free text like "Rated 4.3–4.7★ on GetYourGuide" shows as-is. */}
+          {content.ratingValue.trim() && (
+            <div className="ml-auto flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
+              <div className="text-left leading-tight">
+                <div className="flex items-center gap-2">
+                  {/^\d(\.\d)?$/.test(content.ratingValue.trim()) && (
+                    <StarRating rating={parseFloat(content.ratingValue)} size="sm" theme="dark" />
+                  )}
+                  <span className="text-sm font-bold text-white">{content.ratingValue}</span>
+                </div>
+                {(content.ratingCount || content.ratingChecked) && (
+                  <p className="mt-1 text-xs text-white/70">
+                    {content.ratingCount}
+                    {content.ratingCount && content.ratingChecked && " · "}
+                    {content.ratingChecked && <>checked {formatCheckedMonth(content.ratingChecked)}</>}
+                  </p>
+                )}
               </div>
-              <p className="mt-1 text-xs text-white/70">{content.ratingCount}</p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Photo strip — editable from Homepage → Images tab */}
-        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4 [@media(max-height:900px)]:mt-6">
+        <div className="mt-16 hidden grid-cols-2 gap-4 sm:grid sm:grid-cols-4 [@media(max-height:900px)]:mt-6">
           {gallery.map((img, i) => (
             <div
               key={img.label + i}

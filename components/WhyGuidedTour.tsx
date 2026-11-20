@@ -7,7 +7,7 @@ export default async function WhyGuidedTour() {
   const s = sections.why;
 
   return (
-    <section className="bg-white py-16">
+    <section className="border-t border-stone-900/10 bg-white py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <h2 className="font-display text-3xl font-bold text-stone-900">{s.heading}</h2>
         <p
@@ -39,7 +39,7 @@ export default async function WhyGuidedTour() {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-xs text-stone-900/50">{s.note}</p>
+            <p className="mt-4 text-xs text-stone-900/65">{s.note}</p>
           </div>
         </div>
 
@@ -61,7 +61,7 @@ export default async function WhyGuidedTour() {
           <p className="text-sm font-medium text-stone-900">{s.ctaText}</p>
           <a
             href={s.ctaHref}
-            className="shrink-0 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
+            className="shrink-0 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
           >
             {s.ctaButtonText}
           </a>

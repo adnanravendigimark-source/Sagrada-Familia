@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { getHomepageContent } from "@/lib/homepage";
 
@@ -8,13 +9,10 @@ export default async function TowerAccess() {
   const s = sections.tower;
 
   return (
-    <section id="tower-access" className="bg-basilica-teal/5 py-16">
+    <section id="tower-access" className="border-t border-stone-900/10 bg-white py-16">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-basilica-teal">
-            {s.eyebrow}
-          </span>
-          <h2 className="mt-2 font-display text-3xl font-bold text-stone-900">{s.heading}</h2>
+          <h2 className="font-display text-3xl font-bold text-stone-900 sm:text-4xl">{s.heading}</h2>
           <p
             className="rich-content mt-4 text-stone-900/70"
             dangerouslySetInnerHTML={{ __html: s.body }}
@@ -27,12 +25,22 @@ export default async function TowerAccess() {
               </li>
             ))}
           </ul>
-          <a
-            href={s.ctaHref}
-            className="mt-6 inline-flex rounded-full bg-basilica-teal px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-teal/90"
-          >
-            {s.ctaButtonText}
-          </a>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <a
+              href={s.ctaHref}
+              className="inline-flex min-h-[44px] items-center rounded-full bg-basilica-teal px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-basilica-teal/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-basilica-teal"
+            >
+              {s.ctaButtonText}
+            </a>
+            {s.guideLinkText && /^\/(?!\/)/.test(s.guideHref.trim()) && (
+              <Link
+                href={s.guideHref.trim()}
+                className="text-sm font-semibold text-basilica-teal underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-basilica-teal"
+              >
+                {s.guideLinkText}
+              </Link>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           {s.images.map((img, i) => (

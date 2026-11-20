@@ -1,9 +1,9 @@
 import Link from "next/link";
+import ProviderRating from "./ProviderRating";
 import SafeImage from "./SafeImage";
-import StarRating from "./StarRating";
 import { getTours } from "@/lib/data";
 import { getRelatedPosts } from "@/lib/posts";
-import { getHomepageContent } from "@/lib/homepage";
+import { getHomepageContent, affiliateNoteText } from "@/lib/homepage";
 
 export default async function BlogSidebar({
   slug,
@@ -26,7 +26,7 @@ export default async function BlogSidebar({
         <div className="overflow-hidden rounded-2xl border border-stone-900/10 bg-white shadow-sm">
           <div className="relative aspect-[4/3]">
             <SafeImage src={tour.image} alt={tour.imageAlt} fill sizes="320px" className="object-cover" />
-            <span className="absolute left-3 top-3 rounded-full bg-gold-500 px-2.5 py-1 text-[10px] font-semibold text-white shadow-sm">
+            <span className="absolute left-3 top-3 rounded-full bg-gold-400 px-2.5 py-1 text-[10px] font-semibold text-stone-900 shadow-sm">
               {s.sidebarRecommendedBadge}
             </span>
           </div>
@@ -34,29 +34,31 @@ export default async function BlogSidebar({
             <p className="font-display text-sm font-semibold leading-snug text-stone-900">
               {tour.title}
             </p>
-            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-900/60">
-              <StarRating rating={tour.rating} showValue reviewCount={tour.reviews} size="xs" />
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone-900/70">
+              <ProviderRating rating={tour.rating} reviews={tour.reviews} source={tour.ratingSource} />
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-stone-900/10 pt-4">
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-stone-900/40">from</p>
+                <p className="text-[10px] uppercase tracking-wide text-stone-900/65">from</p>
                 <p className="font-display text-lg font-bold text-stone-900">€{tour.price}</p>
               </div>
               <a
                 href={tour.href}
                 target="_blank"
                 rel="noopener nofollow sponsored"
-                className="rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-basilica-terracotta/90"
+              data-placement="blog_sidebar"
+                className="rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:brightness-90"
               >
-                {header.bookNowText}
+                {tour.ctaLabel || header.bookNowText}
               </a>
             </div>
+            <p className="mt-3 text-xs leading-snug text-stone-900/65">{affiliateNoteText(header)}</p>
           </div>
         </div>
       )}
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-stone-900/40">
+        <p className="text-xs font-semibold uppercase tracking-wider text-stone-900/65">
           {s.sidebarRelatedHeading}
         </p>
         <div className="mt-4 space-y-4">

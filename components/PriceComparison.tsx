@@ -1,17 +1,21 @@
 import { getTours } from "@/lib/data";
-import { getHomepageContent } from "@/lib/homepage";
+import { getHomepageContent, affiliateNoteText } from "@/lib/homepage";
 
 // Built directly from the tours sold above — every row is a real,
 // bookable product with its own "Book" link, so this table works as a
 // second conversion surface rather than just reference info. Heading/
 // subheading/note are editable from /admin/homepage → Content tab (see
 // lib/homepage.ts's PriceSection / DEFAULT_SECTIONS.price).
-export default async function PriceComparison() {
-  const [tours, { sections }] = await Promise.all([getTours(), getHomepageContent()]);
+export default async function PriceComparison({ embedded = false }: { embedded?: boolean } = {}) {
+  const [tours, { sections, header }] = await Promise.all([getTours(), getHomepageContent()]);
   const s = sections.price;
   return (
-    <section id="prices" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h2 className="font-display text-3xl font-bold text-stone-900">{s.heading}</h2>
+    <section id="prices" className={`mx-auto max-w-6xl scroll-mt-20 px-4 sm:px-6 ${embedded ? "pb-16 pt-10" : "py-16"}`}>
+      {embedded ? (
+        <h3 className="font-display text-2xl font-bold text-stone-900">{s.heading}</h3>
+      ) : (
+        <h2 className="font-display text-3xl font-bold text-stone-900">{s.heading}</h2>
+      )}
       <p
         className="rich-content mt-3 max-w-2xl text-stone-900/70"
         dangerouslySetInnerHTML={{ __html: s.subheading }}
@@ -26,7 +30,7 @@ export default async function PriceComparison() {
               <th className="px-5 py-4 font-semibold">{s.column1Label}</th>
               <th className="px-5 py-4 font-semibold">{s.column2Label}</th>
               <th className="px-5 py-4 font-semibold">{s.bestForLabel}</th>
-              <th className="px-5 py-4 font-semibold"></th>
+              <th className="px-5 py-4 font-semibold"><span className="sr-only">{s.bookLabel}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -37,9 +41,9 @@ export default async function PriceComparison() {
                   tour.ribbon === "Bestseller" ? "bg-basilica-teal/5" : i % 2 ? "bg-stone-50" : ""
                 }`}
               >
-                <td className="px-5 py-4 font-medium text-stone-900">{tour.title}</td>
+                <th scope="row" className="px-5 py-4 font-medium text-stone-900">{tour.title}</th>
                 <td className="px-5 py-4 font-semibold text-basilica-terracotta">
-                  €{tour.price} <span className="font-normal text-stone-900/40">/ person</span>
+                  €{tour.price} <span className="font-normal text-stone-900/65">/ person</span>
                 </td>
                 <td className="px-5 py-4 text-stone-900/70">
                   {tour.priceTableColumn1 || (tour.badge === "self-guided" ? "No" : "Yes — certified guide")}
@@ -51,7 +55,8 @@ export default async function PriceComparison() {
                     href={tour.href}
                     target="_blank"
                     rel="noopener nofollow sponsored"
-                    className="inline-flex rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-basilica-terracotta/90"
+              data-placement="price_table"
+                    className="inline-flex rounded-full bg-basilica-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:brightness-90"
                   >
                     {s.bookLabel}
                   </a>
@@ -61,7 +66,8 @@ export default async function PriceComparison() {
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-stone-900/50">{s.note}</p>
+      <p className="mt-3 text-xs text-stone-900/65">{s.note}</p>
+      <p className="mt-1 text-xs text-stone-900/65">{affiliateNoteText(header)}</p>
     </section>
   );
 }

@@ -5,13 +5,17 @@ import { getHomepageContent } from "@/lib/homepage";
 
 export default async function BlogSection() {
   const [allPosts, { sections }] = await Promise.all([getPosts(), getHomepageContent()]);
-  const posts = allPosts.filter((p) => !p.noIndex).slice(0, 3);
+  const live = allPosts.filter((p) => !p.noIndex);
+  const featured = (sections.blogTeaser.featuredSlugs || [])
+    .map((slug) => live.find((p) => p.slug === slug))
+    .filter((p): p is (typeof live)[number] => !!p);
+  const posts = [...featured, ...live.filter((p) => !featured.includes(p))].slice(0, 3);
   const s = sections.blogTeaser;
 
   if (posts.length === 0) return null;
 
   return (
-    <section className="bg-stone-100/70 py-16 sm:py-24 border-t border-stone-200/60" id="blog-guides">
+    <section className="border-t border-stone-900/10 bg-white py-16 sm:py-24" id="blog-guides">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
@@ -54,7 +58,7 @@ export default async function BlogSection() {
                   <span className="inline-flex rounded-full bg-basilica-teal/10 px-2.5 py-0.5 font-semibold uppercase tracking-wide text-basilica-teal">
                     {post.category}
                   </span>
-                  {post.readTime && <span className="text-stone-900/40">{post.readTime}</span>}
+                  {post.readTime && <span className="text-stone-900/65">{post.readTime}</span>}
                 </div>
                 <h3 className="mt-3 font-display text-xl font-bold leading-snug text-stone-900 group-hover:text-basilica-terracotta">
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
@@ -79,7 +83,7 @@ export default async function BlogSection() {
         <div className="mt-10 text-center md:hidden">
           <Link
             href="/blog"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90 shadow-sm"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90 shadow-sm"
           >
             <span>{s.viewAllText}</span>
             <span aria-hidden="true">→</span>

@@ -18,13 +18,13 @@ export default async function NotFound() {
         <h1 className="mt-4 font-display text-2xl font-bold text-stone-900 sm:text-3xl">
           {s.heading}
         </h1>
-        <p className="mt-3 max-w-md text-stone-900/60">
+        <p className="mt-3 max-w-md text-stone-900/70">
           {s.body}
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
             href={s.primaryButtonHref}
-            className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
+            className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
           >
             {s.primaryButtonText}
           </Link>

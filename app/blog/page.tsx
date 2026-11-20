@@ -7,7 +7,7 @@ import SafeImage from "@/components/SafeImage";
 import { getPosts } from "@/lib/posts";
 import { getBlogSeoSettings } from "@/lib/settings";
 import { getHomepageContent } from "@/lib/homepage";
-import { resolveRobots, resolveCanonical, resolveOg } from "@/lib/seo";
+import { resolveRobots, resolveCanonical, resolveOg, pageTitle } from "@/lib/seo";
 
 // Posts now live in /data/posts.json, editable from /admin/posts — render
 // dynamically so new/edited posts show up without a rebuild.
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getBlogSeoSettings();
   const og = resolveOg(settings, { title: settings.metaTitle, description: settings.metaDescription });
   return {
-    title: settings.metaTitle,
+    title: pageTitle(settings.metaTitle),
     description: settings.metaDescription,
     alternates: { canonical: resolveCanonical("/blog", settings.canonicalUrl) },
     robots: resolveRobots(settings.noIndex, settings.noFollow),
@@ -43,7 +43,7 @@ export default async function BlogIndexPage() {
           <h1 className="mt-3 font-display text-3xl font-bold text-stone-900 sm:text-4xl">
             {s.heading}
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-stone-900/60">
+          <p className="mx-auto mt-3 max-w-md text-stone-900/70">
             {s.subheading}
           </p>
         </div>
@@ -106,12 +106,12 @@ export default async function BlogIndexPage() {
                   <span className="inline-flex rounded-full bg-basilica-teal/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-basilica-teal">
                     {post.category}
                   </span>
-                  <span className="text-xs text-stone-900/40">{post.readTime}</span>
+                  <span className="text-xs text-stone-900/65">{post.readTime}</span>
                 </div>
                 <h2 className="mt-3 font-display text-lg font-semibold text-stone-900 group-hover:text-basilica-terracotta">
                   {post.title}
                 </h2>
-                <p className="mt-2 line-clamp-3 text-sm text-stone-900/60">{post.excerpt}</p>
+                <p className="mt-2 line-clamp-3 text-sm text-stone-900/70">{post.excerpt}</p>
               </div>
             </Link>
           ))}
@@ -123,7 +123,7 @@ export default async function BlogIndexPage() {
           </p>
           <a
             href="/#tours"
-            className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-basilica-terracotta/90"
+            className="rounded-full bg-basilica-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:brightness-90"
           >
             {s.ctaButtonText}
           </a>

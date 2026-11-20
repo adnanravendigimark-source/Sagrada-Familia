@@ -1,5 +1,5 @@
 import { getTours } from "@/lib/data";
-import { getHomepageContent } from "@/lib/homepage";
+import { getHomepageContent, affiliateNoteText } from "@/lib/homepage";
 import TourCard from "./TourCard";
 
 export default async function TourGrid() {
@@ -44,6 +44,7 @@ export default async function TourGrid() {
           />
         ))}
       </div>
+      <p className="mt-4 text-xs text-stone-900/65">{affiliateNoteText(content.header)}</p>
     </section>
   );
 }

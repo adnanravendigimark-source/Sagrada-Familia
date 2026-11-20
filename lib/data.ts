@@ -1,4 +1,5 @@
 import { sql } from "./db";
+import { toIsoDate } from "./checkedDate";
 
 // ---------------------------------------------------------------------------
 // AFFILIATE / PARTNER IDS
@@ -57,6 +58,18 @@ export interface TourRecord {
   // column2Label in lib/homepage.ts) — e.g. "Passion or Nativity Tower".
   // Blank renders as "No" in that column.
   priceTableFeature?: string;
+  // Who collected the rating/reviews (shown as "… reviews on GetYourGuide")
+  // and when the rating, review count and duration were last checked
+  // there. Prices have their own date because they're verified separately.
+  ratingSource?: string;
+  lastChecked?: string; // YYYY-MM-DD
+  priceChecked?: string; // YYYY-MM-DD
+  // Button text for this tour's booking links ("Check dates"); blank = the
+  // site-wide "Book Now" text.
+  ctaLabel?: string;
+  // Cancellation terms as the provider lists them ("Free cancellation up to
+  // 24 hours before"); blank = not shown.
+  cancellation?: string;
 }
 
 // The shape components actually render — same as TourRecord but with a
@@ -99,6 +112,11 @@ function rowToTour(row: any): TourRecord {
     bestFor: row.best_for,
     priceTableColumn1: row.price_table_column1 || undefined,
     priceTableFeature: row.price_table_feature || undefined,
+    ratingSource: row.rating_source ?? "GetYourGuide",
+    lastChecked: toIsoDate(row.last_checked),
+    priceChecked: toIsoDate(row.price_checked),
+    ctaLabel: row.cta_label || undefined,
+    cancellation: row.cancellation || undefined,
   };
 }
 
@@ -124,12 +142,14 @@ export async function saveTours(records: TourRecord[]): Promise<void> {
       INSERT INTO tours (
         id, badge, ribbon, title, description, includes, duration, rating,
         reviews, price, original_price, image, image_alt, href_path,
-        href_extra, featured, best_for, price_table_column1, price_table_feature, sort_order
+        href_extra, featured, best_for, price_table_column1, price_table_feature, sort_order,
+        rating_source, last_checked, price_checked, cta_label, cancellation
       ) VALUES (
         ${t.id}, ${t.badge}, ${t.ribbon || null}, ${t.title}, ${t.description},
         ${JSON.stringify(t.includes || [])}::jsonb, ${t.duration || null}, ${t.rating},
         ${t.reviews}, ${t.price}, ${t.originalPrice ?? null}, ${t.image}, ${t.imageAlt},
-        ${t.hrefPath}, ${t.hrefExtra || null}, ${!!t.featured}, ${t.bestFor}, ${t.priceTableColumn1 || ""}, ${t.priceTableFeature || ""}, ${i}
+        ${t.hrefPath}, ${t.hrefExtra || null}, ${!!t.featured}, ${t.bestFor}, ${t.priceTableColumn1 || ""}, ${t.priceTableFeature || ""}, ${i},
+        ${(t.ratingSource ?? "GetYourGuide").trim()}, ${toIsoDate(t.lastChecked) ?? null}, ${toIsoDate(t.priceChecked) ?? null}, ${(t.ctaLabel || "").trim()}, ${(t.cancellation || "").trim()}
       )
       ON CONFLICT (id) DO UPDATE SET
         badge = EXCLUDED.badge,
@@ -150,7 +170,12 @@ export async function saveTours(records: TourRecord[]): Promise<void> {
         best_for = EXCLUDED.best_for,
         price_table_column1 = EXCLUDED.price_table_column1,
         price_table_feature = EXCLUDED.price_table_feature,
-        sort_order = EXCLUDED.sort_order
+        sort_order = EXCLUDED.sort_order,
+        rating_source = EXCLUDED.rating_source,
+        last_checked = EXCLUDED.last_checked,
+        price_checked = EXCLUDED.price_checked,
+        cta_label = EXCLUDED.cta_label,
+        cancellation = EXCLUDED.cancellation
     `;
   }
 

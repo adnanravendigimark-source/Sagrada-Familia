@@ -30,7 +30,7 @@ export default function StarRating({
   return (
     <div className={`inline-flex items-center gap-1.5 ${className}`}>
       {/* 5-star row with fractional fill */}
-      <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} out of ${maxStars} stars`}>
+      <div className="flex items-center gap-0.5" role="img" aria-label={`${rating.toFixed(1)} out of ${maxStars} stars`}>
         {Array.from({ length: maxStars }).map((_, i) => {
           const fillPercent = Math.min(100, Math.max(0, (rating - i) * 100));
 
