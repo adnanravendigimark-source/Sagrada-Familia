@@ -4,7 +4,12 @@
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export function toIsoDate(value: unknown): string | undefined {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10);
+  // The Neon driver turns a DATE into local midnight, so read the local parts:
+  // toISOString() would shift it to the previous day east of UTC.
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+  }
   if (typeof value !== "string") return undefined;
   const v = value.trim().slice(0, 10);
   if (!ISO_DATE.test(v)) return undefined;

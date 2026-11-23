@@ -72,7 +72,6 @@ export default async function HomePage() {
     mainEntity: {
       "@type": "ItemList",
       itemListElement: tours
-        .filter((t) => t.featured)
         .map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.title, url: t.href })),
     },
   };

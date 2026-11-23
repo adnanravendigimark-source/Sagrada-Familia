@@ -31,6 +31,21 @@ const nextConfig = {
     // like this rather than maintaining a domain list by hand.
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
+  // Basic hardening headers (same set as the Amsterdam and Seine sites).
+  // No CSP yet: GA4 and next/image would need a tested policy first.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

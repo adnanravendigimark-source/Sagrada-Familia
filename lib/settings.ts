@@ -17,7 +17,7 @@ export interface BlogSeoSettings {
 }
 
 const DEFAULT_SETTINGS: BlogSeoSettings = {
-  metaTitle: "Sagrada Familia Guides & Tips | Sagrada Familia Guided Tours",
+  metaTitle: "Sagrada Família Guides: Tickets, Towers & Tips",
   metaDescription:
     "Practical guides for visiting Sagrada Familia — tower access, guided tour vs. audio guide, best time to visit, and more.",
   canonicalUrl: "",
