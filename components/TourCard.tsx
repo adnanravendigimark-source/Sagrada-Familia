@@ -107,7 +107,7 @@ export default function TourCard({
               <p className="text-[11px] uppercase tracking-wide text-stone-900/65">from</p>
               <div className="flex items-baseline gap-2">
                 {tour.originalPrice && (
-                  <span className="text-sm text-stone-900/35 line-through">€{tour.originalPrice}</span>
+                  <span className="text-sm text-stone-900/65 line-through"><span className="sr-only">Was </span>€{tour.originalPrice}</span>
                 )}
                 <span className="font-display text-xl font-bold text-stone-900">€{tour.price}</span>
                 <span className="text-xs text-stone-900/65">/ person</span>

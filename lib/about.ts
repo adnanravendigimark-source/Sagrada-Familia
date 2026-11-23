@@ -43,7 +43,7 @@ const DEFAULT_ABOUT: AboutPageContent = {
   heroImage: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=2000&auto=format&fit=crop",
   heroImageAlt: "Sagrada Familia basilica facade in Barcelona",
   content: `<h2>Our Mission</h2>
-<p>We built this site around one belief: a guide is worth more than a bare entry ticket. Sagrada Familia has almost no on-site signage explaining what you're looking at — the symbolism in the façades, why the columns lean like trees, what each tower represents. A skip-the-line ticket gets you through the door. A good guided tour is the difference between seeing a beautiful building and actually understanding Gaudí's design.</p>
+<p>We built this site around one belief: a guide is worth more than a bare entry ticket. Without a guide or an audio guide, it's easy to miss what you're looking at — the symbolism in the façades, why the columns lean like trees, what each tower represents. A skip-the-line ticket gets you through the door. A good guided tour is the difference between seeing a beautiful building and actually understanding Gaudí's design.</p>
 <p>We're an independent Sagrada Familia tickets and tours guide — not the official venue website. We compare guided tours, skip-the-line tickets, and tower-access options bookable on GetYourGuide, and point you to the ones worth your time and money.</p>
 <h2>How We Choose Our Sagrada Familia Guided Tours</h2>
 <p>Every guided tour and ticket listed on this site is screened against four criteria before it earns a spot.</p>
@@ -58,7 +58,7 @@ const DEFAULT_ABOUT: AboutPageContent = {
 <h2>Our Content</h2>
 <p>We try to write practical, honest guides rather than oversold marketing copy — what's actually worth booking, what tower access does and doesn't include, and when a skip-the-line ticket is enough on its own. Details like pricing, availability, and included stops can change, so always check the booking page for the current, accurate information before you buy.</p>
 <h2>Affiliate Disclosure</h2>
-<p>When you book a Sagrada Familia guided tour or ticket through a link on this site, we earn a small commission from the operator at no extra cost to you. This is how we keep the site free and independently written — it doesn't affect which tours we recommend or how we rank them.</p>
+<p>When you book a Sagrada Familia guided tour or ticket through a link on this site, we earn a small commission from GetYourGuide at no extra cost to you. This is how we keep the site free and independently written — commission never changes the facts we show.</p>
 <p>We aim to be transparent about how this site works and how we make our recommendations. Have questions before you book? Reach out via our <a href="/contact">contact page</a>.</p>`,
   metaTitle: "About Us | Sagrada Familia Guided Tour & Ticket Booking Guide",
   metaDescription:

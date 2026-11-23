@@ -410,7 +410,7 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     heading: "What You Actually Get on a Guided Tour",
     intro:
       "Walk in with just a ticket and you'll see an impressive building. Walk in with a guide and someone points out why the columns lean like trees, which carvings tell which Bible story, and what's still being built 140 years later. Here's what a typical 1.5-hour tour covers, step by step.",
-    timelineHeading: "Sample tour timeline",
+    timelineHeading: "Example timeline (the exact route and timing depend on your tour and guide)",
     timeline: [
       { time: "0:00", step: "Meet your guide outside the Nativity Façade — quick intro & security check" },
       { time: "0:15", step: "Nativity Façade: the carvings Gaudí completed in his lifetime, explained scene by scene" },
@@ -491,7 +491,7 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     heading: "Compare & Choose Your Tours & Ticket",
     subheading:
       "All three options side by side — pick the one that fits your trip, then book straight from the table.",
-    note: "Children under 11 typically enter free; students, seniors, and youth-card holders get reduced rates — check each ticket's booking page for exact tiers.",
+    note: "Child and reduced prices are set by each tour on GetYourGuide and can differ from the Basilica's own child ticket rules. Check the price for each traveller on the booking page, and bring ID for children, as it may be checked.",
     itemLabel: "Ticket Type",
     priceLabel: "Price",
     column1Label: "Live Guide",
