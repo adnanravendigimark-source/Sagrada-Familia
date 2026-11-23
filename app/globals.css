@@ -103,6 +103,10 @@ body {
 }
 .rich-content img {
   max-width: 100%;
+  /* Content images carry their intrinsic width/height attributes so the
+     browser reserves space before they load (no layout shift); height:auto
+     keeps them scaling with the column instead of stretching. */
+  height: auto;
   border-radius: 0.75rem;
   margin: 0.75em 0;
 }

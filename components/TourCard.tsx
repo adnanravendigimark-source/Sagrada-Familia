@@ -106,12 +106,19 @@ export default function TourCard({
             <div>
               <p className="text-[11px] uppercase tracking-wide text-stone-900/65">from</p>
               <div className="flex items-baseline gap-2">
-                {tour.originalPrice && (
-                  <span className="text-sm text-stone-900/65 line-through"><span className="sr-only">Was </span>€{tour.originalPrice}</span>
-                )}
                 <span className="font-display text-xl font-bold text-stone-900">€{tour.price}</span>
                 <span className="text-xs text-stone-900/65">/ person</span>
+                {tour.originalPrice && (
+                  // "was €75" after the current price, so the two can't be
+                  // mistaken for each other.
+                  <span className="text-xs text-stone-900/65">
+                    was <span className="line-through">€{tour.originalPrice}</span>
+                  </span>
+                )}
               </div>
+              {/^optional/i.test(tour.priceTableFeature || "") && (
+                <p className="mt-0.5 text-[11px] text-stone-900/65">Tower not included in this price</p>
+              )}
             </div>
             <a
               href={tour.href}
