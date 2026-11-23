@@ -522,13 +522,10 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     intro:
       "<p>The cheapest way in is an official ticket from the basilica's own website. Booking a tour on GetYourGuide costs more, but adds a local guide on the tours and more flexible cancellation.</p>",
     officialHeading: "Official tickets (adult, from)",
-    rows: [
-      { name: "Basilica entry with audio guide app", price: "€26" },
-      { name: "Basilica with official guided visit", price: "€30" },
-      { name: "Basilica entry and one tower", price: "€36" },
-      { name: "Guided visit and one tower", price: "€40" },
-    ],
-    sourceUrl: "https://sagradafamilia.org/en/tickets",
+    // Off by default: the owner doesn't show official prices or link to the
+    // official site. With no rows the section renders nothing.
+    rows: [],
+    sourceUrl: "",
     checked: "",
     tourHeading: "What booking a tour here adds",
     tourPoints: [
