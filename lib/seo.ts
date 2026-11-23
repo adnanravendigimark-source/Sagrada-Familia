@@ -141,7 +141,7 @@ export function buildArticleJsonLd(article: {
     ...(article.image ? { image: [article.image] } : {}),
     datePublished: article.datePublished,
     dateModified: article.dateModified || article.datePublished,
-    author: { "@type": "Person", name: AUTHOR.name, jobTitle: AUTHOR.role, url: AUTHOR.url },
+    author: { "@type": "Person", "@id": AUTHOR.url, name: AUTHOR.name, jobTitle: AUTHOR.role, url: AUTHOR.url },
     publisher: {
       "@type": "Organization",
       name: article.siteName,

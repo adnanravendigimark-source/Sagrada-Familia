@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...(homepage.metaDescription.trim() ? { description: homepage.metaDescription } : {}),
     alternates: { canonical: resolveCanonical("/", homepage.canonicalUrl) },
     robots: resolveRobots(homepage.noIndex, homepage.noFollow),
-    openGraph: { title: og.title, description: og.description, url: "/", images: og.image ? [{ url: og.image }] : undefined },
+    openGraph: { type: "website", title: og.title, description: og.description, url: "/", images: og.image ? [{ url: og.image }] : undefined },
     twitter: { card: "summary_large_image", title: og.title, description: og.description, images: og.image ? [og.image] : undefined },
   };
 }

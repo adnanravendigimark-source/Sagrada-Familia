@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import SafeImage from "@/components/SafeImage";
 import { getAboutPage } from "@/lib/about";
 import { AUTHOR } from "@/lib/author";
-import { resolveRobots, resolveCanonical, resolveOg, pageTitle } from "@/lib/seo";
+import { resolveRobots, resolveCanonical, resolveOg, pageTitle, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 
 
 // Every field below (title, description, canonical, indexing, follow, OG)
@@ -23,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: resolveCanonical("/about", about.canonicalUrl) },
     robots: resolveRobots(about.noIndex, about.noFollow),
     openGraph: {
+      type: "website",
       title: og.title,
       description: og.description,
       url: "/about",
@@ -38,6 +40,22 @@ export async function generateMetadata(): Promise<Metadata> {
 // way a blog post is written, instead of many separate structured fields.
 export default async function AboutPage() {
   const about = await getAboutPage();
+
+  // Matches the visible "Home > About Us" trail in the hero, plus the
+  // editor as a Person entity that every guide's Article author points to.
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "About Us", path: "/about" },
+  ]);
+  const editorJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": AUTHOR.url,
+    name: AUTHOR.name,
+    jobTitle: AUTHOR.role,
+    url: AUTHOR.url,
+    worksFor: { "@type": "Organization", name: "Sagrada Familia Guided Tours", url: SITE_URL },
+  };
 
   return (
     <>
@@ -138,6 +156,8 @@ export default async function AboutPage() {
         </div>
       </main>
       <Footer />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(editorJsonLd) }} />
     </>
   );
 }

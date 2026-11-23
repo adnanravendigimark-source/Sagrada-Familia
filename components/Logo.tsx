@@ -59,7 +59,7 @@ export default function Logo({
         fill
         priority
         sizes="150px"
-        className={customSrc ? "object-contain" : undefined}
+        className={customSrc ? "object-contain" : "object-cover object-top"}
       />
     </span>
   );

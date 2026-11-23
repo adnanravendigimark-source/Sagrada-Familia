@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Don't advertise the framework in an X-Powered-By header.
+  poweredByHeader: false,
   experimental: {
     // Next.js 14.2 quietly reintroduced a *client-side* Router Cache for
     // already-visited routes — 30s for dynamic pages, 5min for static —
