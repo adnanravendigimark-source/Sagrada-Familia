@@ -409,7 +409,7 @@ export const DEFAULT_SECTIONS: HomepageSections = {
   why: {
     heading: "What You Actually Get on a Guided Tour",
     intro:
-      "Walk in with just a ticket and you'll see an impressive building. Walk in with a guide and someone points out why the columns lean like trees, which carvings tell which Bible story, and what's still being built 140 years later. Here's what a typical 2-hour tour covers, hour by hour.",
+      "Walk in with just a ticket and you'll see an impressive building. Walk in with a guide and someone points out why the columns lean like trees, which carvings tell which Bible story, and what's still being built 140 years later. Here's what a typical 1.5-hour tour covers, step by step.",
     timelineHeading: "Sample tour timeline",
     timeline: [
       { time: "0:00", step: "Meet your guide outside the Nativity Façade — quick intro & security check" },
