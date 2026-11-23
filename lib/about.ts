@@ -39,18 +39,18 @@ const DEFAULT_ABOUT: AboutPageContent = {
   heroEyebrow: "About Us",
   heroHeading: "Your Independent Guide to Sagrada Familia Tickets & Guided Tours",
   heroSubheading:
-    "We help travelers book the right Sagrada Familia guided tour or skip-the-line ticket online — curated from certified, licensed operators, explained in plain language.",
+    "We help travelers book the right Sagrada Familia guided tour or skip-the-line ticket online — bookable on GetYourGuide, explained in plain language.",
   heroImage: "https://images.unsplash.com/photo-1567437890326-0084ea9d99e9?q=80&w=2000&auto=format&fit=crop",
   heroImageAlt: "Sagrada Familia basilica facade in Barcelona",
   content: `<h2>Our Mission</h2>
 <p>We built this site around one belief: a guide is worth more than a bare entry ticket. Sagrada Familia has almost no on-site signage explaining what you're looking at — the symbolism in the façades, why the columns lean like trees, what each tower represents. A skip-the-line ticket gets you through the door. A good guided tour is the difference between seeing a beautiful building and actually understanding Gaudí's design.</p>
-<p>We're an independent Sagrada Familia tickets and tours guide — not the official venue website. We compare guided tours, skip-the-line tickets, and tower-access options from licensed, established operators, and point you to the ones worth your time and money.</p>
+<p>We're an independent Sagrada Familia tickets and tours guide — not the official venue website. We compare guided tours, skip-the-line tickets, and tower-access options bookable on GetYourGuide, and point you to the ones worth your time and money.</p>
 <h2>How We Choose Our Sagrada Familia Guided Tours</h2>
 <p>Every guided tour and ticket listed on this site is screened against four criteria before it earns a spot.</p>
 <ul>
-<li><strong>Certified, Licensed Guides —</strong> Every guided tour we list uses certified local guides — not fast-track entry resold as a "tour."</li>
+<li><strong>Live Guides, Clearly Labelled —</strong> We list guided tours with a live guide and only call a guide certified when the listing says so.</li>
 <li><strong>Real Review Volume —</strong> We only list tours with verifiable review counts and ratings, not cherry-picked testimonials.</li>
-<li><strong>Transparent Pricing —</strong> The price you see on the tour card is the price you pay — no hidden fees added at checkout.</li>
+<li><strong>Transparent Pricing —</strong> Tour cards show “from” prices checked on GetYourGuide, with the date we checked them. The price for your date on the booking page is the one that counts.</li>
 <li><strong>Honest, Clear Info —</strong> We tell you exactly what's included — and what isn't, like tower access, which is often separate.</li>
 </ul>
 <h2>Independent Sagrada Familia Guide</h2>
@@ -62,7 +62,7 @@ const DEFAULT_ABOUT: AboutPageContent = {
 <p>We aim to be transparent about how this site works and how we make our recommendations. Have questions before you book? Reach out via our <a href="/contact">contact page</a>.</p>`,
   metaTitle: "About Us | Sagrada Familia Guided Tour & Ticket Booking Guide",
   metaDescription:
-    "Who curates our Sagrada Familia guided tours and skip-the-line tickets online, how we pick certified guides, and why a guided tour beats a bare entry ticket.",
+    "Who curates our Sagrada Familia guided tours and skip-the-line tickets online, how we check facts against GetYourGuide, and when a guided tour beats an entry ticket.",
   canonicalUrl: "",
   noIndex: false,
   noFollow: false,

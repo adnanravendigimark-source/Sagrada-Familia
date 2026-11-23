@@ -56,7 +56,7 @@ const organizationJsonLd = {
   url: SITE_URL,
   logo: `${SITE_URL}/icon.png`,
   description:
-    "Independent guide comparing Sagrada Familia guided tours, skip-the-line tickets, and tower access from licensed operators.",
+    "Independent guide comparing Sagrada Familia guided tours, skip-the-line tickets, and tower access bookable on GetYourGuide.",
 };
 
 const websiteJsonLd = {
@@ -86,7 +86,7 @@ export function generateMetadata(): Metadata {
     },
     // Kept under 155 characters for the same reason.
     description:
-      "Compare Sagrada Familia guided tours and skip-the-line tickets. Certified local guides, tower access, and instant online booking for 2026.",
+      "Compare Sagrada Familia guided tours and skip-the-line tickets. Live guides, tower access, and online booking for 2026.",
     // Google ignores meta keywords; kept short and accurate for other engines.
     keywords: [
       "Sagrada Familia tours",
@@ -104,7 +104,7 @@ export function generateMetadata(): Metadata {
     openGraph: {
       title: "Sagrada Familia Guided Tours & Tickets | Skip the Line + Tower Access",
       description:
-        "Certified guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
+        "Live guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
       type: "website",
       url: SITE_URL,
       siteName: "Sagrada Familia Guided Tours",
@@ -114,7 +114,7 @@ export function generateMetadata(): Metadata {
       card: "summary_large_image",
       title: "Sagrada Familia Guided Tours & Tickets | Skip the Line + Tower Access",
       description:
-        "Certified guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
+        "Live guides, skip-the-line entry, and optional tower access. Compare Sagrada Familia guided tour prices and book online.",
       images: [DEFAULT_OG_IMAGE],
     },
   };

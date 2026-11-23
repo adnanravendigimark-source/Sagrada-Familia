@@ -342,7 +342,7 @@ export const DEFAULT_HEADER: HeaderContent = {
 
 export const DEFAULT_FOOTER: FooterContent = {
   tagline:
-    "<strong>Independent booking guide.</strong> Not the official Sagrada Familia website — we curate guided tours and tickets from licensed operators and earn a commission on bookings made through our links, at no extra cost to you.",
+    "<strong>Independent booking guide.</strong> Not the official Sagrada Familia website — we compare guided tours and tickets bookable on GetYourGuide and earn a commission on bookings made through our links, at no extra cost to you.",
   columns: [
     {
       title: "Explore",
@@ -404,7 +404,7 @@ export const DEFAULT_SECTIONS: HomepageSections = {
   tours: {
     heading: "Sagrada Familia Guided Tours & Tickets",
     subheading:
-      "Three clear options — a guided tour, a guided tour with tower access, and a self-guided entry ticket for a lower budget. A certified guide is the single biggest upgrade to a Sagrada Familia visit.",
+      "Three clear options — a guided tour, a guided tour with tower access, and a self-guided entry ticket for a lower budget. A live guide is the single biggest upgrade to a Sagrada Familia visit.",
   },
   why: {
     heading: "What You Actually Get on a Guided Tour",
@@ -426,7 +426,7 @@ export const DEFAULT_SECTIONS: HomepageSections = {
       "What each of the three façades (Nativity, Passion, Glory) represents",
       "Which details in the stone carvings are easy to miss without someone pointing them out",
     ],
-    note: "Guides are certified local guides briefed on Sagrada Familia's history, architecture, and construction status. Tours run in small groups with a headset system so you can hear clearly even in a full basilica.",
+    note: "The Skip-the-Line Guided Tour includes an audio headset, so you can hear your guide even in a full basilica, and its GetYourGuide listing says the guide is certified by the Barcelona Tourism Authority.",
     extraHeading: "",
     extraItems: [],
     ctaText: "Convinced? The guided tour is €54/person and sells out in peak season.",
@@ -544,7 +544,7 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     cards: [
       {
         title: "How long is a Sagrada Família tour?",
-        body: "The guided tours here take 1.5 hours. Allow about 30 minutes more if you add a tower.",
+        body: "The guided tours here take 1.5 hours. A tower visit adds extra time on top.",
         href: "/blog/how-long-do-you-need-at-sagrada-familia",
         linkText: "How long you need",
       },
@@ -597,9 +597,9 @@ export const DEFAULT_SECTIONS: HomepageSections = {
 // `node scripts/setup-db.mjs` has been run) — a real image rather than an
 // empty string so the hero section never renders broken/blank.
 const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
-  heroBadge: "Certified guides · Skip the line",
+  heroBadge: "Live guides · Skip the line",
   heroHeading: "Sagrada Familia Guided Tours",
-  heroSubheading: "Book a certified local guide and skip the line.",
+  heroSubheading: "Book a live local guide and skip the line.",
   heroImage:
     "https://images.unsplash.com/photo-1735424325493-7dec695219c4?q=80&w=2400&auto=format&fit=crop",
   heroImageAlt: "Sunlight pouring through stained glass and tree-like columns inside the Sagrada Familia basilica",

@@ -1,18 +1,18 @@
 {
-  "heroBadge": "⚡ Certified guides · Skip the line",
-  "heroHeading": "Sagrada Familia Guided Tours — See What a Guide Sees",
-  "heroSubheading": "Skip the line, hear Gaudí's design explained by a certified local guide, and add tower access for the view over Barcelona. Book your Sagrada Familia guided tour online — instant confirmation, free cancellation.",
-  "heroImage": "https://images.unsplash.com/photo-1735424325493-7dec695219c4?q=80&w=2400&auto=format&fit=crop",
+  "heroBadge": "Live guides · Skip the line",
+  "heroHeading": "Sagrada Família Guided Tours & Tickets",
+  "heroSubheading": "<p>Skip the line with a local guide, add a tower, or go at your own pace with an audio guide.</p>",
+  "heroImage": "https://igmhiytmxdd0kk18.public.blob.vercel-storage.com/uploads/1786530350665-0ta4ar-jHJFla6t2CEZo3PWf9AF0vaOvOj7Sl.png",
   "heroImageAlt": "Sunlight pouring through stained glass and tree-like columns inside the Sagrada Familia basilica",
-  "ratingValue": "4.8 / 5",
-  "ratingCount": "1,200+ reviews",
+  "ratingValue": "Rated 4.3–4.7★ on GetYourGuide",
+  "ratingCount": "133,000+ reviews",
   "showFeaturedTour": true,
   "featuredTourId": "fast-track-guided-tour",
   "featuredBadgeLabel": "Recommended",
-  "featuredUrgencyText": "Best Price · Limited Availability",
+  "featuredUrgencyText": "",
   "featuredReasons": [
-    "Our most-booked tour — 18,000+ reviews, averaging 5 stars",
-    "A real person guides you through, not an audio track in your ear",
+    "4.7★ from 4,864 reviews on GetYourGuide (checked 23 Nov 2026)",
+    "A live guide with an audio headset, not just a recorded track",
     "Free cancellation up to 24 hours before"
   ]
 }

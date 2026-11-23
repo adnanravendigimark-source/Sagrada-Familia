@@ -50,7 +50,7 @@ export interface TourRecord {
   bestFor: string;
   // Shown in the homepage price-comparison table's first feature column
   // (see components/PriceComparison.tsx and the Price section's
-  // column1Label in lib/homepage.ts) — e.g. "Yes — certified guide".
+  // column1Label in lib/homepage.ts) — e.g. "Yes — live guide".
   // Blank falls back to the auto Yes/No derived from the tour's Type.
   priceTableColumn1?: string;
   // Shown in the homepage price-comparison table's second feature column
