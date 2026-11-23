@@ -7,6 +7,7 @@ import { resolveRobots } from "@/lib/seo";
 import { getSiteChrome } from "@/lib/homepage";
 import { hexToRgbTriplet } from "@/lib/color";
 import "./globals.css";
+import { EDITORIAL_POLICY_URL } from "@/lib/author";
 
 // Forces every page in the app to render dynamically, root layout included
 // — most pages already set this individually for CMS-freshness reasons,
@@ -57,6 +58,7 @@ const organizationJsonLd = {
   logo: `${SITE_URL}/icon.png`,
   description:
     "Independent guide comparing Sagrada Familia guided tours, skip-the-line tickets, and tower access bookable on GetYourGuide.",
+  publishingPrinciples: EDITORIAL_POLICY_URL,
 };
 
 const websiteJsonLd = {

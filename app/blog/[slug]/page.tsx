@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { formatCheckedDate } from "@/lib/checkedDate";
+import { formatCheckedDate, toIsoDate } from "@/lib/checkedDate";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { AUTHOR } from "@/lib/author";
 import QuickAnswer from "@/components/QuickAnswer";
 import TableOfContents from "@/components/TableOfContents";
 import BlogPostBody from "@/components/BlogPostBody";
@@ -70,14 +71,20 @@ export default async function Post({ params }: { params: { slug: string } }) {
     notFound();
   }
 
+  // "Updated" = the later of the last content save and the last fact-check.
+  const modified = [post.updatedAt, post.lastChecked, post.date]
+    .map((v) => toIsoDate(v))
+    .filter((v): v is string => !!v)
+    .sort()
+    .pop() || post.date;
+
   const articleJsonLd = buildArticleJsonLd({
     headline: post.title,
     description: post.metaDescription,
     image: post.image,
     datePublished: post.date,
-    dateModified: post.updatedAt || post.date,
+    dateModified: modified,
     url: `${SITE_URL}/blog/${post.slug}`,
-    authorName: "Sagrada Familia Guided Tours",
     siteName: "Sagrada Familia Guided Tours",
   });
 
@@ -112,6 +119,13 @@ export default async function Post({ params }: { params: { slug: string } }) {
           <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
             {post.title}
           </h1>
+          <p className="mt-3 text-sm text-stone-900/70">
+            By{" "}
+            <Link href={AUTHOR.path} className="font-semibold text-stone-900 underline underline-offset-2">
+              {AUTHOR.name}
+            </Link>
+            , {AUTHOR.role.toLowerCase()} · Updated <time dateTime={modified}>{formatCheckedDate(modified)}</time>
+          </p>
           {post.excerpt && <p className="mt-3 max-w-3xl text-lg text-stone-600">{post.excerpt}</p>}
           <div className="relative mt-8 aspect-[21/9] w-full overflow-hidden rounded-2xl">
             <SafeImage

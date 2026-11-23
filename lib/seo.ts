@@ -1,4 +1,11 @@
 import { SITE_URL } from "./site";
+import { AUTHOR } from "./author";
+
+// Fallback share image for pages without their own (same photo as the root
+// layout). Pages that set openGraph replace the layout's images, so the
+// fallback has to live here too.
+export const DEFAULT_OG_IMAGE =
+  "https://images.unsplash.com/photo-1735424325493-7dec695219c4?q=80&w=2400&auto=format&fit=crop";
 
 // Rich-text fields (hero subheading, section intros, etc.) are stored as
 // HTML from RichTextEditor.tsx — safe to render on the page itself via
@@ -85,7 +92,7 @@ export function resolveOg(
   return {
     title: fields.ogTitle?.trim() || fallback.title,
     description: fields.ogDescription?.trim() || fallback.description,
-    image: fields.ogImage?.trim() || fallback.image || "",
+    image: fields.ogImage?.trim() || fallback.image || DEFAULT_OG_IMAGE,
   };
 }
 
@@ -113,8 +120,8 @@ export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]) {
 
 // Article structured data for a blog post — eligible for article rich
 // results and helps Google understand publish date/author/section.
-// `authorName` defaults to the site's own brand name since these are
-// single-author-style guides, not a multi-writer publication.
+// The author is the site's named editor (lib/author.ts); the publisher is
+// the site itself, with its logo.
 export function buildArticleJsonLd(article: {
   headline: string;
   description: string;
@@ -124,7 +131,6 @@ export function buildArticleJsonLd(article: {
   // the updatedAt column was added — see lib/posts.ts's rowToPost.
   dateModified?: string;
   url: string;
-  authorName: string;
   siteName: string;
 }) {
   return {
@@ -135,8 +141,13 @@ export function buildArticleJsonLd(article: {
     ...(article.image ? { image: [article.image] } : {}),
     datePublished: article.datePublished,
     dateModified: article.dateModified || article.datePublished,
-    author: { "@type": "Organization", name: article.authorName },
-    publisher: { "@type": "Organization", name: article.siteName },
+    author: { "@type": "Person", name: AUTHOR.name, jobTitle: AUTHOR.role, url: AUTHOR.url },
+    publisher: {
+      "@type": "Organization",
+      name: article.siteName,
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.png` },
+    },
     mainEntityOfPage: { "@type": "WebPage", "@id": article.url },
   };
 }

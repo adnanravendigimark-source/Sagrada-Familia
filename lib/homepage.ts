@@ -439,9 +439,10 @@ export const DEFAULT_SECTIONS: HomepageSections = {
     body:
       "Of Gaudí's 18 planned spires, visitors can currently access two by elevator: the <strong>Passion Tower</strong> and the <strong>Nativity Tower</strong>. Both offer close-up views of the spires and a wide view over Barcelona's Eixample district. You come down via a narrow spiral staircase, so tower access isn't included by default — it's a separate ticket or a guided-tour add-on.",
     bullets: [
-      "Elevator up, spiral staircase down (narrow — not suitable for claustrophobia or limited mobility)",
-      "Requires a specific tower-access ticket, separate from standard entry",
-      "Limited capacity per time slot — books out earlier than standard entry",
+      "Lift up, narrow spiral staircase down (not ideal if you dislike tight spaces)",
+      "Not open to visitors with reduced mobility, pregnant visitors, or anyone with vertigo, heart or breathing problems",
+      "Needs a ticket or tour option that includes a tower; standard entry doesn't",
+      "Children under 6 can't go up; ages 6–16 must be with an adult",
       "Best light for photos: early morning or the hour before sunset",
     ],
     ctaButtonText: "See Tours with Tower Access",

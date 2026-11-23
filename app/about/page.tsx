@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SafeImage from "@/components/SafeImage";
 import { getAboutPage } from "@/lib/about";
+import { AUTHOR } from "@/lib/author";
 import { resolveRobots, resolveCanonical, resolveOg, pageTitle } from "@/lib/seo";
 
 
@@ -86,6 +87,54 @@ export default async function AboutPage() {
             single field (see AboutForm.tsx / TiptapArticleEditor). */}
         <div className="mx-auto max-w-2xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="rich-content leading-relaxed text-stone-900/80" dangerouslySetInnerHTML={{ __html: about.content }} />
+
+          {/* Named editor + editorial policy. Fixed in code (not admin HTML)
+              so the Article schema's author URL and the Organization's
+              publishingPrinciples URL always resolve to these anchors. */}
+          <section id="editor" className="rich-content mt-12 scroll-mt-24 border-t border-stone-200 pt-10 leading-relaxed text-stone-900/80">
+            <h2>Who writes these guides</h2>
+            <p>
+              The guides on this site are written and kept up to date by <strong>{AUTHOR.name}</strong>, the site&apos;s{" "}
+              {AUTHOR.role.toLowerCase()}. John checks each tour&apos;s price, rating, review count, duration and cancellation
+              terms on its GetYourGuide listing, and checks opening hours, entry rules and tower restrictions against the
+              official Sagrada Família website. Every guide shows the date its facts were last checked.
+            </p>
+          </section>
+
+          <section id="editorial-policy" className="rich-content mt-10 scroll-mt-24 leading-relaxed text-stone-900/80">
+            <h2>Editorial policy</h2>
+            <ul>
+              <li>
+                <strong>Where facts come from.</strong> Tour prices, ratings, durations and inclusions come from the
+                GetYourGuide listing for each tour. Opening hours, dress code, entry rules and tower restrictions come from
+                the official Sagrada Família website:{" "}
+                <a href="https://sagradafamilia.org/en/schedules-how-to-get" target="_blank" rel="noopener">opening hours</a>,{" "}
+                <a href="https://sagradafamilia.org/en/rules-and-regulations" target="_blank" rel="noopener">visitor rules</a>,{" "}
+                <a href="https://sagradafamilia.org/en/general-condition-purchase" target="_blank" rel="noopener">ticket conditions</a> and{" "}
+                <a href="https://sagradafamilia.org/en/faqs" target="_blank" rel="noopener">FAQs</a>.
+              </li>
+              <li>
+                <strong>Prices.</strong> We show &quot;from&quot; prices with the date we checked them. Prices change by date
+                and option, so the price on the booking page is the one that counts.
+              </li>
+              <li>
+                <strong>Ratings.</strong> Star ratings and review counts are GetYourGuide&apos;s, shown as text with their
+                source. We don&apos;t write our own reviews or award our own stars.
+              </li>
+              <li>
+                <strong>Affiliate links.</strong> We earn a commission from GetYourGuide when you book through our links, at
+                no extra cost to you. Booking links are marked as sponsored. Commission never changes the facts we show.
+              </li>
+              <li>
+                <strong>Independence.</strong> This is an independent guide. It is not the official Sagrada Família website
+                and is not connected to the Basilica.
+              </li>
+              <li>
+                <strong>Corrections.</strong> If you spot something out of date, <Link href="/contact">tell us</Link>. We
+                re-check it, fix the guide and update its date.
+              </li>
+            </ul>
+          </section>
         </div>
       </main>
       <Footer />
