@@ -128,7 +128,7 @@ export default async function AboutPage() {
                 the official Sagrada Família website:{" "}
                 <a href="https://sagradafamilia.org/en/schedules-how-to-get" target="_blank" rel="noopener">opening hours</a>,{" "}
                 <a href="https://sagradafamilia.org/en/rules-and-regulations" target="_blank" rel="noopener">visitor rules</a>,{" "}
-                <a href="https://sagradafamilia.org/en/general-condition-purchase" target="_blank" rel="noopener">ticket conditions</a> and{" "}
+                <a href="https://sagradafamilia.org/en/general-condition-purchase" target="_blank" rel="noopener">tower and dress-code conditions</a> and{" "}
                 <a href="https://sagradafamilia.org/en/faqs" target="_blank" rel="noopener">FAQs</a>.
               </li>
               <li>
